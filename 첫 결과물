@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>논어한입 | 학생을 위한 쉬운 논어 읽기</title>
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: #f6f8fc;
+      color: #1f2430;
+      line-height: 1.7;
+    }
+    a { text-decoration: none; color: inherit; }
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #e8edf5;
+    }
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #2e4fa7;
+      letter-spacing: -0.03em;
+    }
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      color: #4f586f;
+      font-size: 0.96rem;
+    }
+    .hero {
+      padding: 72px 0 44px;
+      background: radial-gradient(circle at top left, #eef3ff 0%, #f6f8fc 48%, #f6f8fc 100%);
+    }
+    .hero-wrap {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      align-items: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      background: #e9efff;
+      color: #335cdb;
+      font-weight: 800;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      margin: 0 0 14px;
+      font-size: clamp(2.1rem, 5vw, 3.8rem);
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+    }
+    .hero p {
+      margin: 0 0 22px;
+      color: #505a72;
+      font-size: 1.04rem;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: #335cdb;
+      color: white;
+      box-shadow: 0 10px 22px rgba(51, 92, 219, 0.18);
+    }
+    .btn-secondary {
+      background: white;
+      color: #30406f;
+      border-color: #dbe2f2;
+    }
+    .hero-card, .card, .quote-card, .feature-box {
+      background: white;
+      border-radius: 24px;
+      padding: 24px;
+      border: 1px solid #ebeff7;
+      box-shadow: 0 12px 32px rgba(31, 36, 48, 0.06);
+    }
+    .hero-card h3, .card h3, .section-title {
+      margin-top: 0;
+      letter-spacing: -0.02em;
+    }
+    .muted { color: #667086; }
+    .mini-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .mini-item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f7f9ff;
+      border: 1px solid #edf1fb;
+      color: #42506b;
+      font-size: 0.95rem;
+    }
+    .search-box {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: white;
+      border-radius: 18px;
+      padding: 14px;
+      border: 1px solid #e4e8f2;
+      box-shadow: 0 8px 24px rgba(25, 35, 70, 0.05);
+    }
+    .search-box input {
+      flex: 1;
+      min-width: 220px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      padding: 8px 6px;
+      background: transparent;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid #dbe3f4;
+      color: #41506e;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+    section { padding: 34px 0; }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: 1.9rem;
+      letter-spacing: -0.03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .topic-tag {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eef3ff;
+      color: #335cdb;
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+    .quote-original {
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: #26345d;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .quote-translation, .quote-easy, .quote-apply, .quote-point {
+      padding: 14px 16px;
+      border-radius: 16px;
+      margin-top: 12px;
+    }
+    .quote-translation {
+      background: #f7f9fd;
+      border: 1px solid #edf1f7;
+    }
+    .quote-easy {
+      background: #f5f7ff;
+      border-left: 4px solid #335cdb;
+    }
+    .quote-apply {
+      background: #fff8ed;
+      border: 1px solid #f7e3bd;
+    }
+    .quote-point {
+      background: #eefaf2;
+      border: 1px solid #d8f0df;
+    }
+    .meta-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .meta-pill {
+      background: #f3f5fa;
+      color: #58627a;
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+    .scenario-item {
+      background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+      border: 1px solid #e6ecf8;
+      border-radius: 20px;
+      padding: 18px;
+    }
+    .scenario-item h4 { margin: 0 0 8px; }
+    .path-box {
+      display: grid;
+      gap: 12px;
+    }
+    .path-step {
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 16px;
+      background: white;
+      border: 1px solid #e9eef8;
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(31,36,48,0.04);
+    }
+    .step-num {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: #edf2ff;
+      color: #335cdb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+    .lesson-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .lesson-tab {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid #dae3f4;
+      color: #42506d;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .lesson-tab.active {
+      background: #335cdb;
+      border-color: #335cdb;
+      color: white;
+    }
+    .lesson-panel { display: none; }
+    .lesson-panel.active { display: block; }
+    .quote-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+    .insight-list {
+      display: grid;
+      gap: 12px;
+    }
+    .insight-item {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #fbfcff;
+      border: 1px solid #e7edf8;
+    }
+    .quiz-box {
+      background: linear-gradient(135deg, #335cdb 0%, #5d7df0 100%);
+      color: white;
+      border-radius: 26px;
+      padding: 28px;
+      box-shadow: 0 18px 38px rgba(51, 92, 219, 0.24);
+    }
+    .quiz-options {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .quiz-options button {
+      border: none;
+      background: rgba(255,255,255,0.14);
+      color: white;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .quiz-options button:hover { background: rgba(255,255,255,0.22); }
+    .result {
+      margin-top: 16px;
+      min-height: 24px;
+      font-weight: 700;
+    }
+    footer {
+      margin-top: 30px;
+      padding: 28px 0 42px;
+      color: #667086;
+      font-size: 0.95rem;
+    }
+    @media (max-width: 980px) {
+      .hero-wrap, .grid-2, .grid-3, .grid-4, .quote-grid { grid-template-columns: 1fr; }
+      .path-step { grid-template-columns: 1fr; }
+      .step-num { width: 48px; height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="logo">논어한입</div>
+      <nav class="nav-links">
+        <a href="#today">오늘의 논어</a>
+        <a href="#lesson">학이편 읽기</a>
+        <a href="#themes">주제 탐색</a>
+        <a href="#scenarios">상황별 추천</a>
+        <a href="#quiz">퀴즈</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-wrap">
+        <div>
+          <div class="badge">학생을 위한 쉬운 고전 읽기 웹서비스</div>
+          <h1>논어를 시험용 암기가 아니라<br />내 삶과 연결해서 읽는 방법</h1>
+          <p>
+            논어한입은 학생들이 논어 원문을 무조건 외우는 대신,
+            <strong>원문 · 직역 · 쉬운말 · 학교생활 연결</strong> 흐름으로 이해할 수 있게 만든 학습형 웹사이트입니다.
+            특히 학이편의 핵심 구절을 중심으로 배움, 친구, 즐거움, 태도 같은 주제를 쉽게 풀어줍니다.
+          </p>
+          <div class="hero-buttons">
+            <a class="btn btn-primary" href="#lesson">학이편 바로 읽기</a>
+            <a class="btn btn-secondary" href="#themes">주제별 탐색하기</a>
+          </div>
+          <div class="search-box">
+            <input id="searchInput" type="text" placeholder="배움, 친구, 즐거움(樂), 군자, 신의 같은 키워드를 검색해보세요" />
+            <button class="btn btn-primary" onclick="searchQuotes()">검색</button>
+          </div>
+          <div class="chips">
+            <button class="chip" onclick="quickSearch('배움')"># 배움</button>
+            <button class="chip" onclick="quickSearch('친구')"># 친구</button>
+            <button class="chip" onclick="quickSearch('즐거움')"># 樂</button>
+            <button class="chip" onclick="quickSearch('군자')"># 군자</button>
+            <button class="chip" onclick="quickSearch('신의')"># 신의</button>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <h3>서비스 핵심 가치</h3>
+          <div class="mini-list">
+            <div class="mini-item"><strong>쉽게 읽기</strong> — 한문 원문을 학생 눈높이 말로 다시 설명</div>
+            <div class="mini-item"><strong>깊게 이해하기</strong> — 단순 번역이 아니라 왜 중요한지까지 해설</div>
+            <div class="mini-item"><strong>삶과 연결하기</strong> — 학교생활, 친구관계, 공부 습관과 연결</div>
+            <div class="mini-item"><strong>직접 참여하기</strong> — 주제 탐색, 상황 추천, 퀴즈로 능동적 학습</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="today">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>오늘의 논어</h2>
+            <p class="muted">학이편 첫 구절을 기준으로 논어를 처음 접하는 학생도 구조적으로 이해할 수 있게 구성했습니다.</p>
+          </div>
+        </div>
+        <div class="quote-card">
+          <span class="topic-tag">學而第一 01</span>
+          <div class="quote-original">學而時習之, 不亦說乎? 有朋自遠方來, 不亦樂乎? 人不知而不慍, 不亦君子乎?</div>
+          <div class="quote-translation"><strong>직역</strong><br />배우고 때때로 그것을 익히면 또한 기쁘지 아니한가? 벗이 먼 곳에서 찾아오면 또한 즐겁지 아니한가? 남이 나를 알아주지 않아도 성내지 않으면 또한 군자답지 않은가?</div>
+          <div class="quote-easy"><strong>쉬운 해석</strong><br />배움은 반복할수록 재미가 생기고, 좋은 친구와의 만남은 삶을 즐겁게 하며, 남이 나를 몰라줘도 쉽게 흔들리지 않는 태도가 성숙한 사람의 모습이라는 뜻입니다.</div>
+          <div class="quote-apply"><strong>학생 생활 연결</strong><br />시험공부를 반복하면서 실력이 붙는 경험, 멀리 떨어진 친구와 다시 만나 반가운 순간, SNS나 성적처럼 남의 평가에 너무 휘둘리지 않는 태도까지 모두 이 한 구절 안에 담겨 있습니다.</div>
+          <div class="quote-point"><strong>핵심 포인트</strong><br />이 문장은 논어의 출발점답게 <strong>배움 · 관계 · 인격</strong> 세 가지를 한 번에 보여줍니다. 그래서 학생용 논어 서비스의 첫 화면에 가장 잘 어울립니다.</div>
+          <div class="meta-row">
+            <span class="meta-pill">핵심어: 學</span>
+            <span class="meta-pill">핵심어: 朋</span>
+            <span class="meta-pill">핵심어: 樂</span>
+            <span class="meta-pill">핵심어: 君子</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>왜 이 웹이 필요한가</h2>
+            <p class="muted">학생들이 논어를 어려워하는 이유를 서비스 구조로 해결합니다.</p>
+          </div>
+        </div>
+        <div class="grid-3">
+          <article class="feature-box">
+            <span class="topic-tag">문제 1</span>
+            <h3>원문은 짧지만 뜻은 멀게 느껴짐</h3>
+            <p>한문 문장은 길지 않아도 핵심 개념이 압축되어 있어 학생들이 단어 뜻만 보고는 전체 맥락을 이해하기 어렵습니다.</p>
+          </article>
+          <article class="feature-box">
+            <span class="topic-tag">문제 2</span>
+            <h3>기존 번역은 딱딱하고 시험용 느낌이 강함</h3>
+            <p>직역 위주의 설명은 맞지만, 왜 지금 읽어야 하는지 연결되지 않아 학생 입장에서는 흥미를 느끼기 어렵습니다.</p>
+          </article>
+          <article class="feature-box">
+            <span class="topic-tag">해결</span>
+            <h3>학생 언어로 다시 풀고, 실제 상황과 연결</h3>
+            <p>원문 → 번역 → 쉬운말 → 학교생활 사례 → 주제 탐색으로 이어지는 구조를 통해 읽기와 이해를 한 번에 돕습니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="lesson">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>학이편 읽기</h2>
+            <p class="muted">첨부 텍스트의 실제 구절을 바탕으로 학습 카드 형태로 정리했습니다.</p>
+          </div>
+        </div>
+
+        <div class="lesson-tabs">
+          <button class="lesson-tab active" onclick="showLesson('lesson1', this)">배움과 즐거움</button>
+          <button class="lesson-tab" onclick="showLesson('lesson2', this)">반성과 신의</button>
+          <button class="lesson-tab" onclick="showLesson('lesson3', this)">예절과 태도</button>
+          <button class="lesson-tab" onclick="showLesson('lesson4', this)">군자와 성장</button>
+        </div>
+
+        <div id="lesson1" class="lesson-panel active">
+          <div class="quote-grid">
+            <article class="card searchable" data-keywords="배움 즐거움 학이편 반복 공부 친구 락 樂 군자">
+              <span class="topic-tag">學而第一 01</span>
+              <div class="quote-original">學而時習之, 不亦說乎?</div>
+              <div class="quote-translation"><strong>직역</strong><br />배우고 때때로 익히면 또한 기쁘지 아니한가?</div>
+              <div class="quote-easy"><strong>쉬운말</strong><br />공부는 한 번 보는 것보다 자꾸 해볼수록 진짜 내 실력이 되고, 그때 재미도 생긴다.</div>
+              <div class="quote-apply"><strong>학생 예시</strong><br />영어 단어, 발표, 코딩, 운동처럼 반복할수록 익숙해지는 활동에 잘 맞는 문장입니다.</div>
+            </article>
+            <article class="card searchable" data-keywords="친구 즐거움 락 樂 관계 만남 학이편">
+              <span class="topic-tag">學而第一 01</span>
+              <div class="quote-original">有朋自遠方來, 不亦樂乎?</div>
+              <div class="quote-translation"><strong>직역</strong><br />벗이 먼 곳에서 찾아오면 또한 즐겁지 아니한가?</div>
+              <div class="quote-easy"><strong>쉬운말</strong><br />좋은 친구와 다시 만나는 일은 거리와 시간이 있어도 반갑고 큰 기쁨이 된다.</div>
+              <div class="quote-apply"><strong>학생 예시</strong><br />졸업한 친구와 다시 만나거나, 온라인으로 알던 친구와 실제로 만나 반가운 순간을 떠올리면 이해하기 쉽습니다.</div>
+            </article>
+          </div>
+        </div>
+
+        <div id="lesson2" class="lesson-panel">
+          <div class="quote-grid">
+            <article class="card searchable" data-keywords="반성 신의 친구 공부 성찰 증자">
+              <span class="topic-tag">學而第一 04</span>
+              <div class="quote-original">吾日三省吾身, 爲人謀而不忠乎? 與朋友交而不信乎? 傳不習乎?</div>
+              <div class="quote-translation"><strong>직역</strong><br />나는 날마다 세 가지로 나 자신을 반성한다. 남을 위해 일을 하며 성실하지 않았는가? 친구를 사귀며 믿음을 지키지 않았는가? 배운 것을 익히지 않았는가?</div>
+              <div class="quote-easy"><strong>쉬운말</strong><br />하루를 마무리할 때 나의 성실함, 친구와의 약속, 공부 습관을 돌아보라는 뜻입니다.</div>
+              <div class="quote-apply"><strong>학생 예시</strong><br />팀플에서 역할을 제대로 했는지, 친구와의 약속을 지켰는지, 오늘 배운 내용을 복습했는지 점검하는 체크리스트로 활용할 수 있습니다.</div>
+            </article>
+            <article class="card searchable" data-keywords="신의 약속 예절 관계 유자">
+              <span class="topic-tag">學而第一 13</span>
+              <div class="quote-original">信近於義, 言可復也.</div>
+              <div class="quote-translation"><strong>직역</strong><br />믿음이 의로움에 가깝다면 그 말을 실천할 수 있다.</div>
+              <div class="quote-easy"><strong>쉬운말</strong><br />말만 번지르르한 약속이 아니라, 옳고 책임 있는 약속이어야 실제로 지킬 수 있다는 뜻입니다.</div>
+              <div class="quote-apply"><strong>학생 예시</strong><br />친구에게 무리한 약속을 하기보다, 지킬 수 있는 말과 행동을 하는 태도와 연결됩니다.</div>
+            </article>
+          </div>
+        </div>
+
+        <div id="lesson3" class="lesson-panel">
+          <div class="quote-grid">
+            <article class="card searchable" data-keywords="예절 화합 배려 학교생활 관계 예 礼">
+              <span class="topic-tag">學而第一 12</span>
+              <div class="quote-original">禮之用, 和爲貴.</div>
+              <div class="quote-translation"><strong>직역</strong><br />예의 쓰임은 화합을 귀하게 여기는 데 있다.</div>
+              <div class="quote-easy"><strong>쉬운말</strong><br />예절은 형식만 지키는 것이 아니라, 서로 불편하지 않게 잘 지내기 위한 기준이라는 뜻입니다.</div>
+              <div class="quote-apply"><strong>학생 예시</strong><br />반말과 존댓말, 팀플 매너, 발표 태도, 온라인 채팅 예절 등 학교생활 전반에 적용할 수 있습니다.</div>
+            </article>
+            <article class="card searchable" data-keywords="배려 인 관계 친구 존중 己所不欲 勿施於人">
+              <span class="topic-tag">핵심 주제 연결</span>
+              <div class="quote-original">己所不欲, 勿施於人</div>
+              <div class="quote-translation"><strong>직역</strong><br />자기가 원하지 않는 바를 남에게 행하지 말라.</div>
+              <div class="quote-easy"><strong>쉬운말</strong><br />내가 싫은 행동이면 남에게도 하지 말자는 가장 기본적인 배려의 원칙입니다.</div>
+              <div class="quote-apply"><strong>학생 예시</strong><br />뒷담화, 단체 채팅방에서의 무시, 팀플 떠넘기기 같은 행동을 돌아보게 해줍니다.</div>
+            </article>
+          </div>
+        </div>
+
+        <div id="lesson4" class="lesson-panel">
+          <div class="quote-grid">
+            <article class="card searchable" data-keywords="군자 태도 인정 성숙 비교 SNS">
+              <span class="topic-tag">學而第一 01</span>
+              <div class="quote-original">人不知而不慍, 不亦君子乎?</div>
+              <div class="quote-translation"><strong>직역</strong><br />남이 알아주지 않아도 성내지 않으면 또한 군자답지 않은가?</div>
+              <div class="quote-easy"><strong>쉬운말</strong><br />인정받지 못해도 쉽게 화내거나 흔들리지 않고 자기 중심을 지키는 사람이 성숙한 사람입니다.</div>
+              <div class="quote-apply"><strong>학생 예시</strong><br />시험 점수, 좋아요 수, 칭찬 여부만으로 내 가치를 판단하지 않는 태도와 연결됩니다.</div>
+            </article>
+            <article class="card searchable" data-keywords="성장 군자 배움 태도 고치기">
+              <span class="topic-tag">學而第一 08</span>
+              <div class="quote-original">過則勿憚改.</div>
+              <div class="quote-translation"><strong>직역</strong><br />허물이 있으면 고치기를 꺼리지 말라.</div>
+              <div class="quote-easy"><strong>쉬운말</strong><br />실수 자체보다 더 중요한 것은 그 실수를 인정하고 바로잡는 태도라는 뜻입니다.</div>
+              <div class="quote-apply"><strong>학생 예시</strong><br />과제 실수, 친구와의 오해, 발표 실패 이후에 변명보다 수정과 사과를 선택하는 태도에 가깝습니다.</div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="themes">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>주제 탐색</h2>
+            <p class="muted">논어를 단순 원문 모음이 아니라, 학생이 관심 있는 주제로 들어가서 읽을 수 있게 구성합니다.</p>
+          </div>
+        </div>
+        <div class="grid-3">
+          <article class="card">
+            <span class="topic-tag">樂 · 즐거움</span>
+            <h3>즐거움은 놀기만 하는 감정이 아니다</h3>
+            <p>논어의 樂은 배움을 통해 성장하는 기쁨, 좋은 친구를 만나는 기쁨, 마음이 안정된 상태에서 오는 만족감을 함께 담고 있습니다.</p>
+            <div class="meta-row">
+              <span class="meta-pill">연결 구절: 有朋自遠方來</span>
+              <span class="meta-pill">연결 구절: 貧而樂</span>
+            </div>
+          </article>
+          <article class="card">
+            <span class="topic-tag">學 · 배움</span>
+            <h3>논어에서 배움은 지식보다 태도에 가깝다</h3>
+            <p>배움은 외우는 행위가 아니라 반복하고, 질문하고, 고치고, 삶 속에서 실천하는 과정으로 제시됩니다.</p>
+            <div class="meta-row">
+              <span class="meta-pill">연결 구절: 學而時習之</span>
+              <span class="meta-pill">연결 구절: 傳不習乎</span>
+            </div>
+          </article>
+          <article class="card">
+            <span class="topic-tag">君子 · 태도</span>
+            <h3>군자는 완벽한 사람이 아니라 중심이 있는 사람</h3>
+            <p>군자는 남의 인정에만 기대지 않고, 실수를 고치며, 말과 행동에 책임을 지는 사람으로 그려집니다.</p>
+            <div class="meta-row">
+              <span class="meta-pill">연결 구절: 人不知而不慍</span>
+              <span class="meta-pill">연결 구절: 過則勿憚改</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="scenarios">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>상황별 추천</h2>
+            <p class="muted">학생들의 실제 고민을 입구로 삼아 논어 문장을 자연스럽게 연결합니다.</p>
+          </div>
+        </div>
+        <div class="grid-4">
+          <div class="scenario-item">
+            <h4>공부가 하기 싫을 때</h4>
+            <p>“학이시습지”로 반복의 의미와 성장의 즐거움을 보여줍니다.</p>
+          </div>
+          <div class="scenario-item">
+            <h4>친구 관계가 서운할 때</h4>
+            <p>좋은 벗, 신의, 배려에 관한 구절로 관계의 기준을 잡아줍니다.</p>
+          </div>
+          <div class="scenario-item">
+            <h4>나를 몰라줄 때</h4>
+            <p>인정받지 못해도 흔들리지 않는 군자의 태도를 소개합니다.</p>
+          </div>
+          <div class="scenario-item">
+            <h4>예절이 필요할 때</h4>
+            <p>예는 형식이 아니라 화합을 위한 기준이라는 점을 설명합니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>학습 흐름</h2>
+            <p class="muted">학생이 이 웹사이트를 사용할 때의 자연스러운 흐름입니다.</p>
+          </div>
+        </div>
+        <div class="path-box">
+          <div class="path-step">
+            <div class="step-num">01</div>
+            <div>
+              <h3>오늘의 논어를 보고 흥미를 느낀다</h3>
+              <p class="muted">처음에는 긴 텍스트보다 짧은 한 구절을 통해 부담 없이 시작합니다.</p>
+            </div>
+          </div>
+          <div class="path-step">
+            <div class="step-num">02</div>
+            <div>
+              <h3>쉬운말과 학생 예시로 뜻을 이해한다</h3>
+              <p class="muted">원문만 읽는 것이 아니라, 지금 내 생활과 연결해서 해석합니다.</p>
+            </div>
+          </div>
+          <div class="path-step">
+            <div class="step-num">03</div>
+            <div>
+              <h3>주제나 상황별로 비슷한 구절을 더 탐색한다</h3>
+              <p class="muted">배움, 친구, 즐거움, 예절 같은 키워드로 넓혀 읽을 수 있습니다.</p>
+            </div>
+          </div>
+          <div class="path-step">
+            <div class="step-num">04</div>
+            <div>
+              <h3>퀴즈와 자기 점검으로 읽기를 마무리한다</h3>
+              <p class="muted">읽은 구절이 실제로 이해되었는지 직접 확인할 수 있게 합니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>프로젝트 포인트</h2>
+            <p class="muted">발표 때 강조하기 좋은 차별점입니다.</p>
+          </div>
+        </div>
+        <div class="insight-list">
+          <div class="insight-item"><strong>1.</strong> 원문 데이터만 나열하지 않고 학생 친화적 해설 구조를 설계했다.</div>
+          <div class="insight-item"><strong>2.</strong> 학이편 실제 구절을 기반으로 배움, 친구, 즐거움, 군자라는 핵심 주제를 뽑아냈다.</div>
+          <div class="insight-item"><strong>3.</strong> 단순 번역이 아니라 “왜 지금 읽어야 하는가”를 학교생활 사례로 연결했다.</div>
+          <div class="insight-item"><strong>4.</strong> 추후에는 전체 논어 데이터, 북마크, 개인 맞춤 추천, AI 해설 기능으로 확장 가능하다.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz">
+      <div class="container">
+        <div class="quiz-box">
+          <h2 style="margin-top: 0;">짧은 퀴즈</h2>
+          <p>“人不知而不慍, 不亦君子乎?”에 가장 가까운 이해는 무엇일까요?</p>
+          <div class="quiz-options">
+            <button onclick="checkAnswer(false)">A. 남이 나를 알아주지 않으면 화를 내는 것이 당연하다</button>
+            <button onclick="checkAnswer(true)">B. 인정받지 못해도 쉽게 흔들리지 않는 태도가 중요하다</button>
+            <button onclick="checkAnswer(false)">C. 친구를 사귀지 말고 혼자 지내야 한다</button>
+          </div>
+          <div id="quiz-result" class="result"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <strong>논어한입</strong> · 학생들이 논어를 짧고 쉽게 읽고, 자신의 삶과 연결해 이해할 수 있도록 만든 프로젝트형 웹사이트
+    </div>
+  </footer>
+
+  <script>
+    function checkAnswer(isCorrect) {
+      const result = document.getElementById('quiz-result');
+      if (isCorrect) {
+        result.textContent = '정답입니다! 이 구절은 남의 인정에만 기대지 않고 자기 중심을 지키는 태도를 말합니다.';
+      } else {
+        result.textContent = '오답입니다. 이 문장은 남이 알아주지 않아도 화내지 않는 성숙한 태도를 뜻합니다.';
+      }
+    }
+
+    function showLesson(panelId, button) {
+      document.querySelectorAll('.lesson-panel').forEach(panel => panel.classList.remove('active'));
+      document.querySelectorAll('.lesson-tab').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(panelId).classList.add('active');
+      button.classList.add('active');
+    }
+
+    function quickSearch(keyword) {
+      document.getElementById('searchInput').value = keyword;
+      searchQuotes();
+      document.getElementById('lesson').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function searchQuotes() {
+      const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+      const cards = document.querySelectorAll('.searchable');
+
+      if (!keyword) {
+        cards.forEach(card => card.style.display = 'block');
+        return;
+      }
+
+      let visibleCount = 0;
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        const data = (card.dataset.keywords || '').toLowerCase();
+        const match = text.includes(keyword) || data.includes(keyword);
+        card.style.display = match ? 'block' : 'none';
+        if (match) visibleCount++;
+      });
+
+      if (visibleCount === 0) {
+        alert('검색 결과가 없습니다. 배움, 친구, 즐거움, 군자, 신의 같은 키워드로 다시 검색해보세요.');
+        cards.forEach(card => card.style.display = 'block');
+      }
+    }
+  </script>
+</body>
+</html>
