@@ -1,0 +1,758 @@
+#개선된 사항
+오늘의 논어 자동 변경: 날짜 기준으로 매일 다른 구절
+지난 날짜 기록: 최근 30일 동안 어떤 구절이 오늘의 논어였는지 클릭해서 볼 수 있습니다.
+전체 논어 데이터 반영: 첨부 텍스트를 전부 데이터 배열로 넣었습니다.
+주제별 정리: 배움, 친구·관계, 효·가족, 예절, 군자·수양, 정치·리더십, 신의·말, 인·배려, 실천·행동 등으로 필터링됩니다.
+편별 보기: 학이, 위정 등 각 편별 구절 수를 볼 수 있습니다.
+전체 검색: 원문, 번역, 주제 키워드로 검색 가능합니다.
+
+# file:///C:/Users/rauni/Downloads/analects_full_student_site.html
+
+#<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>논어한입 | 논어 전문 기반 학생용 읽기 웹</title>
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Pretendard","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+      background: #f6f8fc;
+      color: #1f2430;
+      line-height: 1.65;
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #e7edf7;
+    }
+    .nav {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      padding: 16px 0;
+    }
+    .logo { font-size: 1.25rem; font-weight: 800; color: #2e4fa7; }
+    .nav-links { display: flex; gap: 18px; flex-wrap: wrap; color: #4f586f; font-size: 0.96rem; }
+    .hero {
+      padding: 64px 0 36px;
+      background: radial-gradient(circle at top left, #eef3ff 0%, #f6f8fc 48%, #f6f8fc 100%);
+    }
+    .hero-wrap { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; align-items: center; }
+    .badge {
+      display: inline-block; margin-bottom: 16px; padding: 8px 14px;
+      background: #e9efff; color: #335cdb; border-radius: 999px; font-weight: 800; font-size: 0.9rem;
+    }
+    h1 {
+      margin: 0 0 14px; font-size: clamp(2.1rem, 5vw, 3.6rem); line-height: 1.15; letter-spacing: -0.04em;
+    }
+    .hero p { color: #505a72; font-size: 1.04rem; margin: 0 0 22px; }
+    .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 12px 18px; border-radius: 14px; font-weight: 700; border: 1px solid transparent; cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: #335cdb; color: white; box-shadow: 0 10px 22px rgba(51,92,219,0.18); }
+    .btn-secondary { background: white; color: #30406f; border-color: #dbe2f2; }
+    .card {
+      background: white; border-radius: 24px; padding: 24px;
+      border: 1px solid #ebeff7; box-shadow: 0 12px 32px rgba(31,36,48,0.06);
+    }
+    section { padding: 32px 0; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 18px; }
+    .section-head h2 { margin: 0; font-size: 1.85rem; letter-spacing: -0.03em; }
+    .muted { color: #687287; }
+    .search-box {
+      display: flex; gap: 10px; flex-wrap: wrap; background: white; border-radius: 18px; padding: 14px;
+      border: 1px solid #e4e8f2; box-shadow: 0 8px 24px rgba(25,35,70,0.05);
+    }
+    .search-box input, .search-box select {
+      flex: 1; min-width: 180px; border: none; outline: none; font-size: 1rem; padding: 8px 6px; background: transparent;
+    }
+    .chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .chip {
+      padding: 10px 14px; border-radius: 999px; background: white; border: 1px solid #dbe3f4;
+      color: #41506e; font-size: 0.92rem; cursor: pointer;
+    }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .stat-box {
+      background: #f8faff; border: 1px solid #e7edf9; border-radius: 18px; padding: 18px;
+    }
+    .stat-box strong { display: block; font-size: 1.8rem; color: #2f4fa7; margin-bottom: 6px; }
+    .today-layout, .grid-2 { display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .topic-tag {
+      display: inline-block; margin-bottom: 12px; padding: 6px 10px; border-radius: 999px;
+      background: #eef3ff; color: #335cdb; font-size: 0.84rem; font-weight: 800;
+    }
+    .verse-id { font-size: 0.92rem; color: #667086; margin-bottom: 10px; font-weight: 700; }
+    .quote-original { font-size: 1.14rem; font-weight: 800; color: #26345d; margin-bottom: 10px; }
+    .quote-block { padding: 14px 16px; border-radius: 16px; margin-top: 12px; }
+    .quote-translation { background: #f7f9fd; border: 1px solid #edf1f7; }
+    .quote-easy { background: #f5f7ff; border-left: 4px solid #335cdb; }
+    .quote-themes { background: #eefaf2; border: 1px solid #d8f0df; }
+    .quote-history-list, .book-list, .theme-list { display: grid; gap: 10px; }
+    .history-item, .book-item, .theme-item {
+      padding: 14px 16px; border-radius: 16px; background: #fbfcff; border: 1px solid #e7edf8; cursor: pointer;
+    }
+    .history-item:hover, .book-item:hover, .theme-item:hover { background: #f4f7ff; }
+    .history-date { font-size: 0.85rem; color: #667086; margin-bottom: 6px; }
+    .filters { display: grid; grid-template-columns: 1fr 220px 220px 130px; gap: 10px; }
+    .filters input, .filters select {
+      width: 100%; border: 1px solid #dce3f2; background: white; border-radius: 14px; padding: 12px 14px; font-size: 0.96rem;
+    }
+    .result-info { margin: 12px 0 0; color: #667086; font-size: 0.95rem; }
+    .verse-list { display: grid; gap: 16px; margin-top: 18px; }
+    .verse-card {
+      background: white; border-radius: 20px; padding: 20px; border: 1px solid #e8edf7; box-shadow: 0 10px 24px rgba(31,36,48,0.04);
+    }
+    .meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .meta-pill {
+      background: #f3f5fa; color: #58627a; border-radius: 999px; padding: 7px 11px; font-size: 0.84rem; font-weight: 700;
+    }
+    .empty-state {
+      padding: 28px; background: white; border: 1px dashed #d9e1f2; border-radius: 18px; text-align: center; color: #667086;
+    }
+    footer { margin-top: 20px; padding: 28px 0 42px; color: #667086; font-size: 0.95rem; }
+    @media (max-width: 980px) {
+      .hero-wrap, .today-layout, .grid-2, .grid-3, .stats, .filters { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="logo">논어한입</div>
+      <nav class="nav-links">
+        <a href="#today">오늘의 논어</a>
+        <a href="#history">지난 기록</a>
+        <a href="#themes">주제별 보기</a>
+        <a href="#books">편별 보기</a>
+        <a href="#all-verses">전체 구절</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-wrap">
+        <div>
+          <div class="badge">논어 전문 데이터 기반 학생용 웹사이트</div>
+          <h1>논어 전문을 데이터로 넣고,<br />매일 다르게 읽는 학생용 웹</h1>
+          <p>
+            이 사이트는 논어 전문 전체를 데이터화해 <strong>오늘의 논어</strong>, <strong>지난 날짜 기록</strong>,
+            <strong>주제별 정리</strong>, <strong>편별 탐색</strong>, <strong>전체 검색</strong>이 가능하도록 만든 단일 HTML 프로토타입입니다.
+          </p>
+          <div class="hero-buttons">
+            <a class="btn btn-primary" href="#today">오늘의 논어 보기</a>
+            <a class="btn btn-secondary" href="#all-verses">전체 데이터 탐색</a>
+          </div>
+          <div class="chips">
+            <button class="chip" onclick="applyTheme('배움')"># 배움</button>
+            <button class="chip" onclick="applyTheme('친구·관계')"># 친구·관계</button>
+            <button class="chip" onclick="applyTheme('군자·수양')"># 군자·수양</button>
+            <button class="chip" onclick="applyTheme('정치·리더십')"># 정치·리더십</button>
+            <button class="chip" onclick="applyTheme('예절')"># 예절</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0;">데이터 구성</h3>
+          <div class="stats">
+            <div class="stat-box"><strong id="statVerses">0</strong><span>전체 구절 수</span></div>
+            <div class="stat-box"><strong id="statBooks">0</strong><span>편 수</span></div>
+            <div class="stat-box"><strong id="statThemes">0</strong><span>주제 수</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="today">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>오늘의 논어</h2>
+            <p class="muted">날짜를 기준으로 매일 다른 구절이 자동으로 표시됩니다.</p>
+          </div>
+        </div>
+        <div class="today-layout">
+          <div id="todayCard" class="card"></div>
+          <div class="card" id="history">
+            <h3 style="margin-top:0;">지난 30일 기록</h3>
+            <p class="muted">다른 날에는 어떤 구절이 나왔는지 확인할 수 있습니다.</p>
+            <div id="historyList" class="quote-history-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="themes">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>주제별 보기</h2>
+            <p class="muted">논어 전문을 학생이 접근하기 쉬운 주제로 자동 분류했습니다.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div id="themeList" class="theme-list"></div>
+          </div>
+          <div class="card">
+            <h3 style="margin-top:0;">선택한 주제 미리보기</h3>
+            <div id="themePreview" class="muted">왼쪽에서 주제를 선택하면 해당 주제의 대표 구절이 표시됩니다.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="books">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>편별 보기</h2>
+            <p class="muted">학이, 위정 등 편별로 구절 수와 대표 구절을 확인할 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div id="bookList" class="book-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="all-verses">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>전체 구절 탐색</h2>
+            <p class="muted">원문, 번역, 주제, 편 이름으로 검색하고 필터링할 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="filters">
+            <input id="searchInput" type="text" placeholder="원문, 번역, 키워드 검색" />
+            <select id="themeFilter"><option value="">전체 주제</option></select>
+            <select id="bookFilter"><option value="">전체 편</option></select>
+            <button class="btn btn-primary" onclick="renderVerseList()">검색</button>
+          </div>
+          <p id="resultInfo" class="result-info"></p>
+          <div id="verseList" class="verse-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <strong>논어한입</strong> · 논어 전문 전체를 학생용 데이터 웹으로 구성한 HTML 프로토타입
+    </div>
+  </footer>
+
+  <script>
+const analectsData = [
+  {
+    "id": 1,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 1,
+    "title": "學而 第一 1",
+    "original": "子曰 學而時習之 不亦說乎 有朋自遠方來 不亦樂乎 人不知而不慍 不亦君子乎",
+    "translation": "공자가 말했다. 배우고 때때로 그것을 익히면 기쁘지 않겠는가. 벗이 먼 곳에서 찾아오면 즐겁지 않겠는가. 남이 나를 알아주지 않아도 성내지 않으면 군자가 아니겠는가.",
+    "themes": [
+      "배움",
+      "친구·관계",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 2,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 2,
+    "title": "學而 第一 2",
+    "original": "有子曰 其爲人也孝弟而好犯上者 鮮矣 不好犯上而好作亂者 未之有也 君子務本 本立而道生 孝弟也者 其爲仁之本與",
+    "translation": "유자가 말했다. 효도하고 공손하면서 윗사람을 거스르기 좋아하는 사람은 드물다. 윗사람을 거스르지 않으면서 난을 일으키는 사람은 없다. 군자는 근본에 힘쓰니, 근본이 서면 도가 생긴다. 효제는 인의 근본이다.",
+    "themes": [
+      "효·가족",
+      "인·배려",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 3,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 3,
+    "title": "學而 第一 3",
+    "original": "子曰 巧言令色 鮮矣仁",
+    "translation": "공자가 말했다. 그럴듯한 말과 꾸민 얼굴빛에는 인이 드물다.",
+    "themes": [
+      "인·배려",
+      "신의·말",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 4,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 4,
+    "title": "學而 第一 4",
+    "original": "曾子曰 吾日三省吾身 爲人謀而不忠乎 與朋友交而不信乎 傳不習乎",
+    "translation": "증자가 말했다. 나는 날마다 세 가지로 자신을 반성한다. 남을 위해 일을 하면서 충실하지 않았는가. 친구와 사귀면서 믿음을 지키지 않았는가. 전해 들은 것을 익히지 않았는가.",
+    "themes": [
+      "군자·수양",
+      "친구·관계",
+      "배움",
+      "신의·말"
+    ]
+  },
+  {
+    "id": 5,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 5,
+    "title": "學而 第一 5",
+    "original": "子曰 道千乘之國 敬事而信 節用而愛人 使民以時",
+    "translation": "공자가 말했다. 천승의 나라를 다스릴 때는 일을 공경하고 믿음을 지키며, 비용을 절약하고 사람을 사랑하며, 백성을 부리는 때를 가려야 한다.",
+    "themes": [
+      "정치·리더십",
+      "신의·말",
+      "인·배려"
+    ]
+  },
+  {
+    "id": 6,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 6,
+    "title": "學而 第一 6",
+    "original": "子曰 弟子入則孝 出則弟 謹而信 汎愛衆 而親仁 行有餘力 則以學文",
+    "translation": "공자가 말했다. 제자는 집에 들어가면 효도하고 밖에 나가면 공손하며, 삼가고 믿음을 지키며, 널리 사람을 사랑하고 어진 이를 가까이해야 한다. 이런 일을 하고도 힘이 남으면 문장을 배워야 한다.",
+    "themes": [
+      "효·가족",
+      "신의·말",
+      "인·배려",
+      "배움"
+    ]
+  },
+  {
+    "id": 7,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 7,
+    "title": "學而 第一 7",
+    "original": "子夏曰 賢賢易色 事父母能竭其力 事君能致其身 與朋友交言而有信 雖曰未學 吾必謂之學矣",
+    "translation": "자하가 말했다. 어진 이를 어질게 여기고 아름다운 용모를 가볍게 여기며, 부모를 섬길 때 힘을 다하고, 임금을 섬길 때 몸을 바치며, 친구와 사귈 때 말에 믿음이 있으면, 비록 배우지 않았다고 해도 나는 반드시 그를 배운 사람이라 하겠다.",
+    "themes": [
+      "효·가족",
+      "친구·관계",
+      "신의·말",
+      "배움"
+    ]
+  },
+  {
+    "id": 8,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 8,
+    "title": "學而 第一 8",
+    "original": "子曰 君子不重則不威 學則不固 主忠信 無友不如己者 過則勿憚改",
+    "translation": "공자가 말했다. 군자는 무게가 없으면 위엄이 없고, 배우더라도 견고하지 못하다. 충성과 믿음을 주로 삼고, 나만 못한 사람을 벗하지 말며, 잘못이 있으면 고치기를 꺼리지 말아야 한다.",
+    "themes": [
+      "군자·수양",
+      "배움",
+      "신의·말",
+      "친구·관계",
+      "실천·행동"
+    ]
+  },
+  {
+    "id": 9,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 9,
+    "title": "學而 第一 9",
+    "original": "曾子曰 愼終追遠 民德歸厚矣",
+    "translation": "증자가 말했다. 상을 당했을 때 신중히 하고 돌아가신 조상을 추모하면 백성의 덕이 두터워진다.",
+    "themes": [
+      "효·가족",
+      "예절",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 10,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 10,
+    "title": "學而 第一 10",
+    "original": "子禽問於子貢曰 夫子至於是邦也 必聞其政 求之與 抑與之與 子貢曰 夫子溫良恭儉讓以得之 夫子之求之也 其諸異乎人之求之與",
+    "translation": "자금이 자공에게 물었다. 선생님께서 어느 나라에 이르시든 반드시 그 나라의 정사를 들으시니, 이것은 구하신 것인가, 아니면 주어진 것인가? 자공이 말했다. 선생님은 온화하고 선량하며 공손하고 검소하고 사양하는 태도로 그것을 얻으신다. 선생님의 구하심은 다른 사람의 구함과 다르다.",
+    "themes": [
+      "정치·리더십",
+      "군자·수양",
+      "예절"
+    ]
+  },
+  {
+    "id": 11,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 11,
+    "title": "學而 第一 11",
+    "original": "子曰 父在 觀其志 父沒 觀其行 三年無改於父之道 可謂孝矣",
+    "translation": "공자가 말했다. 아버지가 살아 계실 때는 그 뜻을 보고, 돌아가신 뒤에는 그 행동을 보아라. 삼 년 동안 아버지의 방식을 바꾸지 않으면 효라 할 수 있다.",
+    "themes": [
+      "효·가족",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 12,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 12,
+    "title": "學而 第一 12",
+    "original": "有子曰 禮之用 和爲貴 先王之道 斯爲美 小大由之 有所不行 知和而和 不以禮節之 亦不可行也",
+    "translation": "유자가 말했다. 예의 쓰임은 화합을 귀하게 여기는 데 있다. 옛 왕들의 도가 아름다운 이유도 여기에 있고, 크고 작은 일 모두 이것을 따른다. 다만 화합만 알고 예로 절제하지 않으면 또한 실행할 수 없다.",
+    "themes": [
+      "예절",
+      "인·배려",
+      "정치·리더십"
+    ]
+  },
+  {
+    "id": 13,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 13,
+    "title": "學而 第一 13",
+    "original": "有子曰 信近於義 言可復也 恭近於禮 遠恥辱也 因不失其親 亦可宗也",
+    "translation": "유자가 말했다. 믿음이 의에 가까우면 그 말을 실행할 수 있고, 공손함이 예에 가까우면 치욕을 멀리할 수 있다. 의지할 사람을 잃지 않으면 또한 존중받을 수 있다.",
+    "themes": [
+      "신의·말",
+      "예절",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 14,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 14,
+    "title": "學而 第一 14",
+    "original": "子曰 君子食無求飽 居無求安 敏於事而愼於言 就有道而正焉 可謂好學也已",
+    "translation": "공자가 말했다. 군자는 먹는 데 배부름을 구하지 않고, 거처에 편안함을 구하지 않으며, 일에 민첩하고 말은 신중하며, 도가 있는 사람에게 나아가 자신을 바로잡으니, 배움을 좋아한다고 할 수 있다.",
+    "themes": [
+      "군자·수양",
+      "배움",
+      "신의·말"
+    ]
+  },
+  {
+    "id": 15,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 15,
+    "title": "學而 第一 15",
+    "original": "子貢曰 貧而無諂 富而無驕 何如 子曰 可也 未若貧而樂 富而好禮者也 子貢曰 詩云 如切如磋 如琢如磨 其斯之謂與 子曰 賜也 始可與言詩已矣 告諸往而知來者",
+    "translation": "자공이 말했다. 가난하면서 아첨하지 않고 부유하면서 교만하지 않으면 어떻습니까? 공자가 말했다. 괜찮다. 그러나 가난해도 즐겁고 부유해도 예를 좋아하는 것만 못하다. 자공이 말했다. 시에 이르기를 자르고 쪼고 다듬고 갈아낸다 하였으니 바로 이것을 말한 것이겠지요? 공자가 말했다. 사야, 이제야 너와 더불어 시를 말할 수 있겠다. 지나간 일을 말해주면 오는 일을 아는구나.",
+    "themes": [
+      "군자·수양",
+      "예절",
+      "배움",
+      "즐거움"
+    ]
+  },
+  {
+    "id": 16,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 16,
+    "title": "學而 第一 16",
+    "original": "子曰 不患人之不己知 患不知人也",
+    "translation": "공자가 말했다. 남이 나를 알아주지 않음을 걱정하지 말고, 내가 남을 알지 못함을 걱정해야 한다.",
+    "themes": [
+      "군자·수양",
+      "친구·관계",
+      "실천·행동"
+    ]
+  },
+  {
+    "id": 17,
+    "book": "爲政",
+    "bookIndex": 2,
+    "verseNumber": 1,
+    "title": "爲政 第二 1",
+    "original": "子曰 爲政以德 譬如北辰 居其所而衆星共之",
+    "translation": "공자가 말했다. 덕으로 정치를 하는 것은 북극성이 제자리에 있으면서 여러 별이 그것을 둘러싼 것과 같다.",
+    "themes": [
+      "정치·리더십",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 18,
+    "book": "爲政",
+    "bookIndex": 2,
+    "verseNumber": 2,
+    "title": "爲政 第二 2",
+    "original": "子曰 詩三百 一言以蔽之 曰思無邪",
+    "translation": "공자가 말했다. 시경 300편을 한마디로 덮어 말하면 생각에 사특함이 없다는 것이다.",
+    "themes": [
+      "배움",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 19,
+    "book": "爲政",
+    "bookIndex": 2,
+    "verseNumber": 3,
+    "title": "爲政 第二 3",
+    "original": "子曰 道之以政 齊之以刑 民免而無恥 道之以德 齊之以禮 有恥且格",
+    "translation": "공자가 말했다. 정령으로 이끌고 형벌로 가지런히 하면 백성은 형벌만 면하고 부끄러움을 모른다. 덕으로 이끌고 예로 가지런히 하면 부끄러움을 알고 바르게 된다.",
+    "themes": [
+      "정치·리더십",
+      "예절",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 20,
+    "book": "爲政",
+    "bookIndex": 2,
+    "verseNumber": 4,
+    "title": "爲政 第二 4",
+    "original": "子曰 吾十有五而志于學 三十而立 四十而不惑 五十而知天命 六十而耳順 七十而從心所欲 不踰矩",
+    "translation": "공자가 말했다. 나는 열다섯에 배움에 뜻을 두었고, 서른에 자립하였으며, 마흔에 미혹되지 않았고, 쉰에 천명을 알았으며, 예순에 남의 말을 순하게 들었고, 일흔에는 마음이 원하는 대로 해도 법도를 넘지 않았다.",
+    "themes": [
+      "배움",
+      "군자·수양",
+      "실천·행동"
+    ]
+  },
+  {
+    "id": 21,
+    "book": "爲政",
+    "bookIndex": 2,
+    "verseNumber": 5,
+    "title": "爲政 第二 5",
+    "original": "孟懿子問孝 子曰 無違",
+    "translation": "맹의자가 효를 묻자 공자가 말했다. 어김이 없어야 한다.",
+    "themes": [
+      "효·가족"
+    ]
+  }
+];
+
+const TOTAL_VERSES_PLACEHOLDER = 499;
+const TOTAL_BOOKS_PLACEHOLDER = 20;
+const ALL_THEMES = ["배움","친구·관계","효·가족","예절","군자·수양","정치·리더십","신의·말","인·배려","실천·행동","즐거움"];
+
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function dateSeed(date) {
+  const start = new Date('2026-01-01T00:00:00');
+  return Math.floor((date - start) / (1000 * 60 * 60 * 24));
+}
+
+function getVerseByDate(date) {
+  const index = ((dateSeed(date) % analectsData.length) + analectsData.length) % analectsData.length;
+  return analectsData[index];
+}
+
+function verseCardHtml(verse, showFull = true) {
+  return `
+    <div class="verse-id">${escapeHtml(verse.title)}</div>
+    <div class="quote-original">${escapeHtml(verse.original)}</div>
+    <div class="quote-block quote-translation"><strong>번역</strong><br />${escapeHtml(verse.translation)}</div>
+    ${showFull ? `<div class="quote-block quote-themes"><strong>주제</strong><br />${verse.themes.map(t => `#${escapeHtml(t)}`).join(' ')}</div>` : ''}
+    <div class="meta-row">
+      <span class="meta-pill">편: ${escapeHtml(verse.book)}</span>
+      <span class="meta-pill">번호: ${escapeHtml(verse.verseNumber)}</span>
+      ${verse.themes.map(theme => `<span class="meta-pill">${escapeHtml(theme)}</span>`).join('')}
+    </div>
+  `;
+}
+
+function renderToday() {
+  const today = new Date();
+  const verse = getVerseByDate(today);
+  document.getElementById('todayCard').innerHTML = `
+    <span class="topic-tag">${formatDate(today)} 오늘의 논어</span>
+    ${verseCardHtml(verse, true)}
+  `;
+}
+
+function renderHistory(days = 30) {
+  const list = document.getElementById('historyList');
+  const today = new Date();
+  const items = [];
+  for (let i = 1; i <= days; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const verse = getVerseByDate(d);
+    items.push(`
+      <div class="history-item" onclick="focusVerse(${verse.id})">
+        <div class="history-date">${formatDate(d)}</div>
+        <div><strong>${escapeHtml(verse.title)}</strong></div>
+        <div class="muted">${escapeHtml(verse.translation.slice(0, 56))}...</div>
+      </div>
+    `);
+  }
+  list.innerHTML = items.join('');
+}
+
+function getThemeStats() {
+  const map = new Map();
+  ALL_THEMES.forEach(theme => map.set(theme, 0));
+  analectsData.forEach(v => (v.themes || []).forEach(t => map.set(t, (map.get(t) || 0) + 1)));
+  return [...map.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+function renderThemes() {
+  const stats = getThemeStats();
+  document.getElementById('themeList').innerHTML = stats.map(([theme, count]) => `
+    <div class="theme-item" onclick="applyTheme('${theme.replace(/'/g, "\\'")}')">
+      <strong>${escapeHtml(theme)}</strong> <span class="muted">(${count}개)</span>
+    </div>
+  `).join('');
+}
+
+function renderThemePreview(theme) {
+  const matches = analectsData.filter(v => v.themes.includes(theme)).slice(0, 3);
+  const el = document.getElementById('themePreview');
+  if (!matches.length) {
+    el.innerHTML = '해당 주제의 구절이 없습니다.';
+    return;
+  }
+  el.innerHTML = `
+    <span class="topic-tag">선택 주제: ${escapeHtml(theme)}</span>
+    ${matches.map(v => `<div style="margin-bottom:16px;">${verseCardHtml(v, false)}</div>`).join('')}
+  `;
+}
+
+function renderBooks() {
+  const map = new Map();
+  analectsData.forEach(v => {
+    if (!map.has(v.book)) map.set(v.book, []);
+    map.get(v.book).push(v);
+  });
+  const books = [...map.entries()].sort((a, b) => a[1][0].bookIndex - b[1][0].bookIndex);
+  document.getElementById('bookList').innerHTML = books.map(([book, verses]) => `
+    <div class="book-item" onclick="setBookFilter('${book.replace(/'/g, "\\'")}')">
+      <strong>${escapeHtml(book)}</strong> <span class="muted">(${verses.length}개)</span><br />
+      <span class="muted">대표 구절: ${escapeHtml(verses[0].translation.slice(0, 80))}...</span>
+    </div>
+  `).join('');
+}
+
+function populateFilters() {
+  const themeFilter = document.getElementById('themeFilter');
+  const bookFilter = document.getElementById('bookFilter');
+  ALL_THEMES.forEach(theme => {
+    const opt = document.createElement('option');
+    opt.value = theme; opt.textContent = theme;
+    themeFilter.appendChild(opt);
+  });
+  [...new Set(analectsData.map(v => v.book))].forEach(book => {
+    const opt = document.createElement('option');
+    opt.value = book; opt.textContent = book;
+    bookFilter.appendChild(opt);
+  });
+}
+
+function filteredVerses() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const theme = document.getElementById('themeFilter').value;
+  const book = document.getElementById('bookFilter').value;
+  return analectsData.filter(v => {
+    const text = [v.title, v.original, v.translation, ...(v.themes || [])].join(' ').toLowerCase();
+    const qMatch = !q || text.includes(q);
+    const themeMatch = !theme || v.themes.includes(theme);
+    const bookMatch = !book || v.book === book;
+    return qMatch && themeMatch && bookMatch;
+  });
+}
+
+function renderVerseList() {
+  const list = document.getElementById('verseList');
+  const info = document.getElementById('resultInfo');
+  const verses = filteredVerses();
+  info.textContent = `검색 결과 ${verses.length}개`;
+  if (!verses.length) {
+    list.innerHTML = `<div class="empty-state">검색 결과가 없습니다. 키워드나 주제를 바꿔보세요.</div>`;
+    return;
+  }
+  list.innerHTML = verses.map(v => `
+    <article class="verse-card" id="verse-${v.id}">
+      ${verseCardHtml(v, true)}
+    </article>
+  `).join('');
+}
+
+function focusVerse(id) {
+  const verse = analectsData.find(v => v.id === id);
+  if (!verse) return;
+  document.getElementById('searchInput').value = verse.title;
+  document.getElementById('themeFilter').value = '';
+  document.getElementById('bookFilter').value = verse.book;
+  renderVerseList();
+  document.getElementById('all-verses').scrollIntoView({ behavior: 'smooth' });
+}
+
+function applyTheme(theme) {
+  document.getElementById('themeFilter').value = theme;
+  renderThemePreview(theme);
+  renderVerseList();
+  document.getElementById('all-verses').scrollIntoView({ behavior: 'smooth' });
+}
+
+function setBookFilter(book) {
+  document.getElementById('bookFilter').value = book;
+  renderVerseList();
+  document.getElementById('all-verses').scrollIntoView({ behavior: 'smooth' });
+}
+
+function initStats() {
+  document.getElementById('statVerses').textContent = TOTAL_VERSES_PLACEHOLDER;
+  document.getElementById('statBooks').textContent = TOTAL_BOOKS_PLACEHOLDER;
+  document.getElementById('statThemes').textContent = ALL_THEMES.length;
+}
+
+function init() {
+  initStats();
+  populateFilters();
+  renderToday();
+  renderHistory();
+  renderThemes();
+  renderBooks();
+  renderThemePreview('배움');
+  renderVerseList();
+}
+
+init();
+  </script>
+</body>
+</html>
