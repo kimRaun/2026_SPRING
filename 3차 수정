@@ -1,0 +1,1367 @@
+학습용 콘텐츠인만큼 학생들의 흥미를 끌면서도 유익하게 수정
+
+-기록 시스템 구축 (인상깊은 구절 메모 가능하게 수정, 오늘 읽기 완료, 연속 학습일, 총 학습일, 최고 연속 기록, 14일 체크표)
+-퀴즈 기능: 뜻 맞히기, 주제 맞히기, 원문 찾기, 정답률 저장
+-흥미롭게 학습할 수 있도록 이모지 활용
+
+file:///C:/Users/rauni/Downloads/index_upgraded.html
+
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="날짜별 오늘의 논어, 최근 30일 기록, 주제별·편별 보기, 전체 검색을 지원하는 학생용 논어 학습 웹사이트" />
+  <title>논어한입 | 학생용 논어 학습 웹</title>
+  <style>
+    :root {
+      --bg: #f7f2ea;
+      --bg-soft: #fffaf1;
+      --card: rgba(255, 255, 255, .84);
+      --card-solid: #ffffff;
+      --text: #26201a;
+      --muted: #74695e;
+      --line: rgba(87, 66, 45, .16);
+      --brand: #8b5e34;
+      --brand-2: #d99b4a;
+      --accent: #2f7d68;
+      --danger: #b95a4f;
+      --shadow: 0 18px 50px rgba(86, 62, 37, .13);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --max: 1180px;
+      --font-scale: 1;
+    }
+
+    [data-theme="dark"] {
+      --bg: #15120f;
+      --bg-soft: #211b16;
+      --card: rgba(38, 31, 25, .84);
+      --card-solid: #231d18;
+      --text: #f5ebdc;
+      --muted: #cbbda8;
+      --line: rgba(255, 238, 213, .14);
+      --brand: #e4b16c;
+      --brand-2: #f2c77f;
+      --accent: #8ed7bc;
+      --danger: #f19a8d;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .34);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(217,155,74,.25), transparent 28rem),
+        radial-gradient(circle at 90% 20%, rgba(47,125,104,.15), transparent 24rem),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: calc(16px * var(--font-scale));
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(116, 105, 94, .04) 1px, transparent 1px), linear-gradient(90deg, rgba(116, 105, 94, .035) 1px, transparent 1px);
+      background-size: 38px 38px;
+      mask-image: linear-gradient(to bottom, black, transparent 70%);
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; border: 0; }
+
+    .skip-link {
+      position: absolute; left: -999px; top: 12px; z-index: 50;
+      background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 12px;
+    }
+    .skip-link:focus { left: 12px; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: color-mix(in srgb, var(--bg) 78%, transparent);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .logo {
+      display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:-.04em;
+      font-size: 1.12rem;
+    }
+    .logo-mark {
+      width:38px; height:38px; display:grid; place-items:center; border-radius: 14px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff; box-shadow: var(--shadow);
+    }
+    .nav-links {
+      display:flex; gap: 6px; align-items:center; flex-wrap:wrap; justify-content:flex-end;
+    }
+    .nav-links a, .icon-btn {
+      padding: 9px 12px; border-radius: 999px; color: var(--muted);
+      background: transparent;
+    }
+    .nav-links a:hover, .icon-btn:hover {
+      background: color-mix(in srgb, var(--brand) 12%, transparent);
+      color: var(--text);
+    }
+    .icon-btn {
+      border: 1px solid var(--line);
+      color: var(--text);
+      min-width: 42px;
+    }
+
+    main { max-width: var(--max); margin: 0 auto; padding: 30px 20px 72px; }
+    .hero {
+      display:grid; grid-template-columns: 1.05fr .95fr; gap: 22px; align-items: stretch;
+      padding: 36px 0 20px;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+    .hero-copy { padding: 38px; position:relative; overflow:hidden; }
+    .hero-copy::after {
+      content: "論語";
+      position:absolute; right: 18px; bottom: -34px;
+      font-family: Georgia, serif; font-size: 8rem; font-weight: 900;
+      color: color-mix(in srgb, var(--brand) 12%, transparent);
+      line-height: 1;
+    }
+    .eyebrow {
+      display:inline-flex; align-items:center; gap:8px; padding: 7px 12px;
+      border: 1px solid var(--line); border-radius: 999px;
+      color: var(--brand); background: color-mix(in srgb, var(--brand-2) 13%, transparent);
+      font-weight: 800; font-size: .86rem;
+    }
+    h1 { margin: 18px 0 12px; font-size: clamp(2.25rem, 6vw, 4.8rem); line-height: 1.03; letter-spacing:-.075em; }
+    .lead { color: var(--muted); font-size: 1.08rem; max-width: 58ch; }
+    .hero-actions { display:flex; gap: 10px; flex-wrap:wrap; margin-top: 24px; }
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding: 12px 16px; border-radius: 999px; font-weight: 850;
+      background: var(--card-solid); color: var(--text); border: 1px solid var(--line);
+      box-shadow: 0 10px 22px rgba(0,0,0,.04);
+    }
+    .btn.primary { background: linear-gradient(135deg, var(--brand), var(--brand-2)); color:#fff; border-color: transparent; }
+    .btn:hover { transform: translateY(-1px); }
+
+    .today-card { padding: 28px; display:flex; flex-direction:column; min-height: 100%; }
+    .section-title { display:flex; align-items:end; justify-content:space-between; gap:14px; margin-bottom: 16px; }
+    .section-title h2 { margin:0; font-size: 1.45rem; letter-spacing:-.04em; }
+    .hint { color: var(--muted); font-size:.92rem; }
+    .date-pill { color: var(--accent); font-weight: 900; }
+    .original {
+      font-family: "Noto Serif CJK KR", "Nanum Myeongjo", Georgia, serif;
+      font-size: 1.55rem; line-height: 1.85; letter-spacing: .03em;
+      margin: 18px 0; padding: 20px; border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--brand-2) 11%, transparent);
+      border: 1px solid var(--line);
+    }
+    .translation { color: var(--text); margin: 0 0 16px; }
+    .meta-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:auto; }
+    .tag {
+      display:inline-flex; align-items:center; gap:6px;
+      padding: 6px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 11%, transparent);
+      color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+      font-size:.86rem; font-weight: 750;
+    }
+    .tag.book { background: color-mix(in srgb, var(--brand) 10%, transparent); color: var(--brand); border-color: color-mix(in srgb, var(--brand) 22%, transparent); }
+
+    .stats {
+      display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 14px 0 28px;
+    }
+    .stat { padding: 18px; border-radius: var(--radius-lg); background: var(--card); border:1px solid var(--line); }
+    .stat strong { display:block; font-size: 1.9rem; letter-spacing:-.04em; }
+    .stat span { color: var(--muted); font-size:.9rem; }
+
+    .toolbar {
+      position: sticky; top: 70px; z-index: 10;
+      padding: 14px; border-radius: var(--radius-xl); margin: 20px 0 26px;
+      display:grid; grid-template-columns: 1.4fr .75fr .75fr auto; gap: 10px;
+      background: color-mix(in srgb, var(--card-solid) 84%, transparent);
+      border:1px solid var(--line); box-shadow: var(--shadow); backdrop-filter: blur(18px);
+    }
+    .field {
+      position:relative;
+    }
+    .field input, .field select {
+      width:100%; height: 48px; border-radius: 16px; border:1px solid var(--line);
+      background: var(--card-solid); color: var(--text); padding: 0 14px;
+      outline: none;
+    }
+    .field input:focus, .field select:focus { border-color: var(--brand); box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 14%, transparent); }
+
+    .grid-2 { display:grid; grid-template-columns: .9fr 1.1fr; gap: 18px; }
+    .grid-3 { display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    section { scroll-margin-top: 132px; margin-top: 32px; }
+    .section-panel { padding: 24px; }
+    .history {
+      display:grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+    }
+    .history button {
+      padding: 10px 8px; border-radius: 14px; background: var(--card-solid); color: var(--text);
+      border:1px solid var(--line); text-align:left;
+    }
+    .history button:hover, .history button.active { border-color: var(--brand); background: color-mix(in srgb, var(--brand-2) 13%, var(--card-solid)); }
+    .history small { display:block; color: var(--muted); }
+
+    .theme-card, .book-card, .verse-card {
+      background: var(--card-solid); border:1px solid var(--line); border-radius: var(--radius-lg);
+      padding: 18px; transition: .18s ease; overflow:hidden;
+    }
+    .theme-card:hover, .book-card:hover, .verse-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .theme-card h3, .book-card h3 { margin:0 0 8px; letter-spacing:-.035em; }
+    .count { color: var(--brand); font-weight: 900; }
+    .mini { color: var(--muted); font-size:.92rem; }
+    .verse-list { display:grid; gap: 12px; }
+    .verse-head { display:flex; justify-content:space-between; gap: 12px; align-items:flex-start; }
+    .verse-title { font-weight: 900; letter-spacing:-.025em; }
+    .verse-actions { display:flex; gap: 6px; flex-shrink:0; }
+    .tiny-btn {
+      padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--bg-soft) 76%, transparent); color: var(--muted); font-size:.86rem;
+    }
+    .tiny-btn.active { color: var(--brand); border-color: var(--brand); }
+    .empty { text-align:center; color: var(--muted); padding: 44px 12px; }
+
+    .progress-wrap { margin-top: 18px; }
+    .progress-line { height: 10px; background: color-mix(in srgb, var(--brand) 12%, transparent); border-radius: 999px; overflow:hidden; }
+    .progress-bar { height:100%; width:0%; background: linear-gradient(90deg, var(--accent), var(--brand-2)); border-radius:999px; transition:.25s; }
+
+    footer { max-width: var(--max); margin: 0 auto; padding: 24px 20px 42px; color: var(--muted); text-align:center; }
+
+    @media (max-width: 900px) {
+      .hero, .grid-2 { grid-template-columns: 1fr; }
+      .stats, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+      .toolbar { position: static; grid-template-columns: 1fr; }
+      .history { grid-template-columns: repeat(2, 1fr); }
+      .nav { align-items:flex-start; }
+      .nav-links a { display:none; }
+      .hero-copy { padding: 28px; }
+    }
+    @media (max-width: 560px) {
+      main { padding-inline: 14px; }
+      .stats, .grid-3 { grid-template-columns: 1fr; }
+      .history { grid-template-columns: 1fr; }
+      .original { font-size:1.28rem; padding: 16px; }
+      h1 { font-size: 2.55rem; }
+    }
+
+    /* 업그레이드: 디자인 효과, 기록 시스템, 퀴즈 */
+    .hero, .panel, .stat {
+      animation: riseIn .55s ease both;
+    }
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .panel {
+      position: relative;
+    }
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,255,255,.34), transparent 38%);
+      opacity: .55;
+    }
+    .hero-copy h1 {
+      background: linear-gradient(135deg, var(--text), var(--brand));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .stats { grid-template-columns: repeat(5, 1fr); }
+    .record-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 10px 0 16px;
+    }
+    .record-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: color-mix(in srgb, var(--brand-2) 8%, var(--card-solid));
+    }
+    .record-box strong {
+      display: block;
+      font-size: 1.65rem;
+      letter-spacing: -.04em;
+      color: var(--brand);
+    }
+    .record-box span, .calendar-title { color: var(--muted); font-size: .92rem; }
+    .study-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .day-dot {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 9px 6px;
+      text-align: center;
+      background: var(--card-solid);
+      color: var(--muted);
+      font-size: .86rem;
+    }
+    .day-dot.done {
+      background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 62%, var(--brand-2)));
+      color: #fff;
+      border-color: transparent;
+      font-weight: 900;
+    }
+    .memo {
+      width: 100%;
+      min-height: 205px;
+      resize: vertical;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: var(--card-solid);
+      color: var(--text);
+      padding: 16px;
+      outline: none;
+      line-height: 1.7;
+    }
+    .memo:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 14%, transparent);
+    }
+    .quiz-zone {
+      overflow: hidden;
+    }
+    .quiz-card {
+      display: grid;
+      gap: 14px;
+    }
+    .quiz-question {
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--brand-2) 24%, transparent), transparent 36%),
+        var(--card-solid);
+      padding: 22px;
+    }
+    .quiz-type {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 13%, transparent);
+      color: var(--accent);
+      font-weight: 900;
+      font-size: .88rem;
+      margin-bottom: 10px;
+    }
+    .quiz-prompt {
+      font-size: 1.16rem;
+      font-weight: 850;
+      letter-spacing: -.03em;
+      margin-bottom: 10px;
+    }
+    .quiz-source {
+      font-family: "Noto Serif CJK KR", "Nanum Myeongjo", Georgia, serif;
+      font-size: 1.25rem;
+      line-height: 1.75;
+      color: var(--text);
+    }
+    .quiz-options {
+      display: grid;
+      gap: 10px;
+    }
+    .quiz-option {
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card-solid);
+      color: var(--text);
+      padding: 14px 16px;
+      transition: .16s ease;
+    }
+    .quiz-option:hover {
+      transform: translateX(3px);
+      border-color: var(--brand);
+    }
+    .quiz-option.correct {
+      background: color-mix(in srgb, var(--accent) 18%, var(--card-solid));
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 900;
+    }
+    .quiz-option.wrong {
+      background: color-mix(in srgb, var(--danger) 14%, var(--card-solid));
+      border-color: var(--danger);
+      color: var(--danger);
+      font-weight: 900;
+    }
+    .quiz-result {
+      min-height: 28px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .quiz-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translate(-50%, 20px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+      background: var(--text);
+      color: var(--bg);
+      padding: 12px 16px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      transition: .22s ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    @media (max-width: 860px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .record-grid { grid-template-columns: 1fr; }
+      .study-calendar { grid-template-columns: repeat(2, 1fr); }
+    }
+
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#content">본문 바로가기</a>
+  <header>
+    <nav class="nav" aria-label="주요 메뉴">
+      <a class="logo" href="#">
+        <span class="logo-mark">論</span>
+        <span>논어한입</span>
+      </a>
+      <div class="nav-links">
+        <a href="#today">오늘</a>
+        <a href="#history">30일 기록</a>
+        <a href="#learning">학습기록</a>
+        <a href="#quiz">퀴즈</a>
+        <a href="#themes">주제별</a>
+        <a href="#books">편별</a>
+        <a href="#all-verses">전체 검색</a>
+        <button class="icon-btn" id="fontDown" title="글자 작게">A-</button>
+        <button class="icon-btn" id="fontUp" title="글자 크게">A+</button>
+        <button class="icon-btn" id="themeToggle" title="다크 모드">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="content">
+    <section class="hero" aria-label="소개">
+      <div class="panel hero-copy">
+        <span class="eyebrow">매일 한 구절씩 읽는 논어</span>
+        <h1>오늘의 논어를<br>쉽고 선명하게</h1>
+        <p class="lead">날짜 기준으로 매일 다른 구절을 보여주고, 최근 30일 기록·주제별 보기·편별 보기·전체 검색까지 한 화면에서 학습할 수 있습니다.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#today">오늘 구절 보기</a>
+          <button class="btn" id="randomBtn">무작위 구절</button>
+          <a class="btn" href="#all-verses">전체 검색</a>
+        </div>
+        <div class="progress-wrap">
+          <div class="mini" id="progressText">학습 진행률을 계산하는 중입니다.</div>
+          <div class="progress-line" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+        </div>
+      </div>
+
+      <article class="panel today-card" id="today">
+        <div class="section-title">
+          <div>
+            <h2>오늘의 논어</h2>
+            <div class="hint"><span class="date-pill" id="todayDate"></span> 기준 자동 선택</div>
+          </div>
+          <button class="tiny-btn" id="todayCopy">복사</button>
+        </div>
+        <div id="todayContent"></div>
+      </article>
+    </section>
+
+    <section class="stats" aria-label="자료 통계">
+      <div class="stat"><strong id="statVerses">0</strong><span>전체 구절</span></div>
+      <div class="stat"><strong id="statBooks">0</strong><span>수록 편</span></div>
+      <div class="stat"><strong id="statThemes">0</strong><span>주제 키워드</span></div>
+      <div class="stat"><strong id="statBookmarks">0</strong><span>저장한 구절</span></div>
+      <div class="stat"><strong id="statStreak">0</strong><span>연속 학습일</span></div>
+    </section>
+
+    <section class="toolbar" aria-label="검색과 필터">
+      <div class="field"><input id="searchInput" type="search" placeholder="원문·번역·주제 검색 예: 배움, 군자, 孝" /></div>
+      <div class="field"><select id="themeFilter"><option value="">모든 주제</option></select></div>
+      <div class="field"><select id="bookFilter"><option value="">모든 편</option></select></div>
+      <button class="btn" id="resetBtn">초기화</button>
+    </section>
+
+    <section class="grid-2">
+      <div class="panel section-panel" id="history">
+        <div class="section-title">
+          <h2>최근 30일 기록</h2>
+          <span class="hint">날짜를 누르면 구절이 바뀝니다</span>
+        </div>
+        <div class="history" id="historyList"></div>
+      </div>
+
+      <div class="panel section-panel">
+        <div class="section-title">
+          <h2>선택한 구절</h2>
+          <span class="hint" id="selectedHint">최근 선택 내용</span>
+        </div>
+        <div id="selectedVerse"></div>
+      </div>
+    </section>
+
+
+    <section class="grid-2" id="learning">
+      <div class="panel section-panel record-panel">
+        <div class="section-title">
+          <div>
+            <h2>학습 기록 시스템</h2>
+            <span class="hint">오늘 읽기 완료를 누르면 기록이 저장됩니다</span>
+          </div>
+          <button class="tiny-btn" id="completeToday">오늘 읽기 완료</button>
+        </div>
+        <div class="record-grid">
+          <div class="record-box"><strong id="recordStreak">0일</strong><span>연속 학습</span></div>
+          <div class="record-box"><strong id="recordTotal">0일</strong><span>총 학습일</span></div>
+          <div class="record-box"><strong id="recordBest">0일</strong><span>최고 연속</span></div>
+        </div>
+        <div class="calendar-title">최근 14일 학습 체크</div>
+        <div class="study-calendar" id="studyCalendar"></div>
+      </div>
+
+      <div class="panel section-panel">
+        <div class="section-title">
+          <div>
+            <h2>나의 학습 메모</h2>
+            <span class="hint">브라우저에 자동 저장됩니다</span>
+          </div>
+          <button class="tiny-btn" id="saveMemo">메모 저장</button>
+        </div>
+        <textarea id="studyMemo" class="memo" placeholder="오늘 인상 깊었던 구절, 느낀 점, 수행평가에 쓸 생각을 적어보세요."></textarea>
+      </div>
+    </section>
+
+    <section class="panel section-panel quiz-zone" id="quiz">
+      <div class="section-title">
+        <div>
+          <h2>논어 퀴즈</h2>
+          <span class="hint">뜻 맞히기 · 주제 맞히기 · 원문 찾기 중 무작위 출제</span>
+        </div>
+        <div class="quiz-score" id="quizScore">0문제 풀이 · 정답 0개</div>
+      </div>
+      <div class="quiz-card" id="quizCard"></div>
+    </section>
+
+    <section class="panel section-panel" id="themes">
+      <div class="section-title">
+        <h2>주제별 정리</h2>
+        <span class="hint">카드를 누르면 해당 주제로 필터링됩니다</span>
+      </div>
+      <div class="grid-3" id="themeCards"></div>
+    </section>
+
+    <section class="panel section-panel" id="books">
+      <div class="section-title">
+        <h2>편별 보기</h2>
+        <span class="hint">각 편별 수록 구절 수</span>
+      </div>
+      <div class="grid-3" id="bookCards"></div>
+    </section>
+
+    <section class="panel section-panel" id="all-verses">
+      <div class="section-title">
+        <div>
+          <h2>전체 구절</h2>
+          <div class="hint" id="resultSummary">검색 결과를 준비 중입니다.</div>
+        </div>
+        <button class="tiny-btn" id="bookmarkedOnly">저장한 구절만</button>
+      </div>
+      <div class="verse-list" id="verseList"></div>
+    </section>
+  </main>
+
+  <footer>
+    기록 시스템 · 디자인 업그레이드 · 퀴즈를 포함한 GitHub Pages용 단일 HTML입니다. 파일명을 <strong>index.html</strong>로 저장하세요.
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+const analectsData = [
+  {
+    "id": 1,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 1,
+    "title": "學而 第一 1",
+    "original": "子曰 學而時習之 不亦說乎 有朋自遠方來 不亦樂乎 人不知而不慍 不亦君子乎",
+    "translation": "공자가 말했다. 배우고 때때로 그것을 익히면 기쁘지 않겠는가. 벗이 먼 곳에서 찾아오면 즐겁지 않겠는가. 남이 나를 알아주지 않아도 성내지 않으면 군자가 아니겠는가.",
+    "themes": [
+      "배움",
+      "친구·관계",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 2,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 2,
+    "title": "學而 第一 2",
+    "original": "有子曰 其爲人也孝弟而好犯上者 鮮矣 不好犯上而好作亂者 未之有也 君子務本 本立而道生 孝弟也者 其爲仁之本與",
+    "translation": "유자가 말했다. 효도하고 공손하면서 윗사람을 거스르기 좋아하는 사람은 드물다. 윗사람을 거스르지 않으면서 난을 일으키는 사람은 없다. 군자는 근본에 힘쓰니, 근본이 서면 도가 생긴다. 효제는 인의 근본이다.",
+    "themes": [
+      "효·가족",
+      "인·배려",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 3,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 3,
+    "title": "學而 第一 3",
+    "original": "子曰 巧言令色 鮮矣仁",
+    "translation": "공자가 말했다. 그럴듯한 말과 꾸민 얼굴빛에는 인이 드물다.",
+    "themes": [
+      "인·배려",
+      "신의·말",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 4,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 4,
+    "title": "學而 第一 4",
+    "original": "曾子曰 吾日三省吾身 爲人謀而不忠乎 與朋友交而不信乎 傳不習乎",
+    "translation": "증자가 말했다. 나는 날마다 세 가지로 자신을 반성한다. 남을 위해 일을 하면서 충실하지 않았는가. 친구와 사귀면서 믿음을 지키지 않았는가. 전해 들은 것을 익히지 않았는가.",
+    "themes": [
+      "군자·수양",
+      "친구·관계",
+      "배움",
+      "신의·말"
+    ]
+  },
+  {
+    "id": 5,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 5,
+    "title": "學而 第一 5",
+    "original": "子曰 道千乘之國 敬事而信 節用而愛人 使民以時",
+    "translation": "공자가 말했다. 천승의 나라를 다스릴 때는 일을 공경하고 믿음을 지키며, 비용을 절약하고 사람을 사랑하며, 백성을 부리는 때를 가려야 한다.",
+    "themes": [
+      "정치·리더십",
+      "신의·말",
+      "인·배려"
+    ]
+  },
+  {
+    "id": 6,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 6,
+    "title": "學而 第一 6",
+    "original": "子曰 弟子入則孝 出則弟 謹而信 汎愛衆 而親仁 行有餘力 則以學文",
+    "translation": "공자가 말했다. 제자는 집에 들어가면 효도하고 밖에 나가면 공손하며, 삼가고 믿음을 지키며, 널리 사람을 사랑하고 어진 이를 가까이해야 한다. 이런 일을 하고도 힘이 남으면 문장을 배워야 한다.",
+    "themes": [
+      "효·가족",
+      "신의·말",
+      "인·배려",
+      "배움"
+    ]
+  },
+  {
+    "id": 7,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 7,
+    "title": "學而 第一 7",
+    "original": "子夏曰 賢賢易色 事父母能竭其力 事君能致其身 與朋友交言而有信 雖曰未學 吾必謂之學矣",
+    "translation": "자하가 말했다. 어진 이를 어질게 여기고 아름다운 용모를 가볍게 여기며, 부모를 섬길 때 힘을 다하고, 임금을 섬길 때 몸을 바치며, 친구와 사귈 때 말에 믿음이 있으면, 비록 배우지 않았다고 해도 나는 반드시 그를 배운 사람이라 하겠다.",
+    "themes": [
+      "효·가족",
+      "친구·관계",
+      "신의·말",
+      "배움"
+    ]
+  },
+  {
+    "id": 8,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 8,
+    "title": "學而 第一 8",
+    "original": "子曰 君子不重則不威 學則不固 主忠信 無友不如己者 過則勿憚改",
+    "translation": "공자가 말했다. 군자는 무게가 없으면 위엄이 없고, 배우더라도 견고하지 못하다. 충성과 믿음을 주로 삼고, 나만 못한 사람을 벗하지 말며, 잘못이 있으면 고치기를 꺼리지 말아야 한다.",
+    "themes": [
+      "군자·수양",
+      "배움",
+      "신의·말",
+      "친구·관계",
+      "실천·행동"
+    ]
+  },
+  {
+    "id": 9,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 9,
+    "title": "學而 第一 9",
+    "original": "曾子曰 愼終追遠 民德歸厚矣",
+    "translation": "증자가 말했다. 상을 당했을 때 신중히 하고 돌아가신 조상을 추모하면 백성의 덕이 두터워진다.",
+    "themes": [
+      "효·가족",
+      "예절",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 10,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 10,
+    "title": "學而 第一 10",
+    "original": "子禽問於子貢曰 夫子至於是邦也 必聞其政 求之與 抑與之與 子貢曰 夫子溫良恭儉讓以得之 夫子之求之也 其諸異乎人之求之與",
+    "translation": "자금이 자공에게 물었다. 선생님께서 어느 나라에 이르시든 반드시 그 나라의 정사를 들으시니, 이것은 구하신 것인가, 아니면 주어진 것인가? 자공이 말했다. 선생님은 온화하고 선량하며 공손하고 검소하고 사양하는 태도로 그것을 얻으신다. 선생님의 구하심은 다른 사람의 구함과 다르다.",
+    "themes": [
+      "정치·리더십",
+      "군자·수양",
+      "예절"
+    ]
+  },
+  {
+    "id": 11,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 11,
+    "title": "學而 第一 11",
+    "original": "子曰 父在 觀其志 父沒 觀其行 三年無改於父之道 可謂孝矣",
+    "translation": "공자가 말했다. 아버지가 살아 계실 때는 그 뜻을 보고, 돌아가신 뒤에는 그 행동을 보아라. 삼 년 동안 아버지의 방식을 바꾸지 않으면 효라 할 수 있다.",
+    "themes": [
+      "효·가족",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 12,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 12,
+    "title": "學而 第一 12",
+    "original": "有子曰 禮之用 和爲貴 先王之道 斯爲美 小大由之 有所不行 知和而和 不以禮節之 亦不可行也",
+    "translation": "유자가 말했다. 예의 쓰임은 화합을 귀하게 여기는 데 있다. 옛 왕들의 도가 아름다운 이유도 여기에 있고, 크고 작은 일 모두 이것을 따른다. 다만 화합만 알고 예로 절제하지 않으면 또한 실행할 수 없다.",
+    "themes": [
+      "예절",
+      "인·배려",
+      "정치·리더십"
+    ]
+  },
+  {
+    "id": 13,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 13,
+    "title": "學而 第一 13",
+    "original": "有子曰 信近於義 言可復也 恭近於禮 遠恥辱也 因不失其親 亦可宗也",
+    "translation": "유자가 말했다. 믿음이 의에 가까우면 그 말을 실행할 수 있고, 공손함이 예에 가까우면 치욕을 멀리할 수 있다. 의지할 사람을 잃지 않으면 또한 존중받을 수 있다.",
+    "themes": [
+      "신의·말",
+      "예절",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 14,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 14,
+    "title": "學而 第一 14",
+    "original": "子曰 君子食無求飽 居無求安 敏於事而愼於言 就有道而正焉 可謂好學也已",
+    "translation": "공자가 말했다. 군자는 먹는 데 배부름을 구하지 않고, 거처에 편안함을 구하지 않으며, 일에 민첩하고 말은 신중하며, 도가 있는 사람에게 나아가 자신을 바로잡으니, 배움을 좋아한다고 할 수 있다.",
+    "themes": [
+      "군자·수양",
+      "배움",
+      "신의·말"
+    ]
+  },
+  {
+    "id": 15,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 15,
+    "title": "學而 第一 15",
+    "original": "子貢曰 貧而無諂 富而無驕 何如 子曰 可也 未若貧而樂 富而好禮者也 子貢曰 詩云 如切如磋 如琢如磨 其斯之謂與 子曰 賜也 始可與言詩已矣 告諸往而知來者",
+    "translation": "자공이 말했다. 가난하면서 아첨하지 않고 부유하면서 교만하지 않으면 어떻습니까? 공자가 말했다. 괜찮다. 그러나 가난해도 즐겁고 부유해도 예를 좋아하는 것만 못하다. 자공이 말했다. 시에 이르기를 자르고 쪼고 다듬고 갈아낸다 하였으니 바로 이것을 말한 것이겠지요? 공자가 말했다. 사야, 이제야 너와 더불어 시를 말할 수 있겠다. 지나간 일을 말해주면 오는 일을 아는구나.",
+    "themes": [
+      "군자·수양",
+      "예절",
+      "배움",
+      "즐거움"
+    ]
+  },
+  {
+    "id": 16,
+    "book": "學而",
+    "bookIndex": 1,
+    "verseNumber": 16,
+    "title": "學而 第一 16",
+    "original": "子曰 不患人之不己知 患不知人也",
+    "translation": "공자가 말했다. 남이 나를 알아주지 않음을 걱정하지 말고, 내가 남을 알지 못함을 걱정해야 한다.",
+    "themes": [
+      "군자·수양",
+      "친구·관계",
+      "실천·행동"
+    ]
+  },
+  {
+    "id": 17,
+    "book": "爲政",
+    "bookIndex": 2,
+    "verseNumber": 1,
+    "title": "爲政 第二 1",
+    "original": "子曰 爲政以德 譬如北辰 居其所而衆星共之",
+    "translation": "공자가 말했다. 덕으로 정치를 하는 것은 북극성이 제자리에 있으면서 여러 별이 그것을 둘러싼 것과 같다.",
+    "themes": [
+      "정치·리더십",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 18,
+    "book": "爲政",
+    "bookIndex": 2,
+    "verseNumber": 2,
+    "title": "爲政 第二 2",
+    "original": "子曰 詩三百 一言以蔽之 曰思無邪",
+    "translation": "공자가 말했다. 시경 300편을 한마디로 덮어 말하면 생각에 사특함이 없다는 것이다.",
+    "themes": [
+      "배움",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 19,
+    "book": "爲政",
+    "bookIndex": 2,
+    "verseNumber": 3,
+    "title": "爲政 第二 3",
+    "original": "子曰 道之以政 齊之以刑 民免而無恥 道之以德 齊之以禮 有恥且格",
+    "translation": "공자가 말했다. 정령으로 이끌고 형벌로 가지런히 하면 백성은 형벌만 면하고 부끄러움을 모른다. 덕으로 이끌고 예로 가지런히 하면 부끄러움을 알고 바르게 된다.",
+    "themes": [
+      "정치·리더십",
+      "예절",
+      "군자·수양"
+    ]
+  },
+  {
+    "id": 20,
+    "book": "爲政",
+    "bookIndex": 2,
+    "verseNumber": 4,
+    "title": "爲政 第二 4",
+    "original": "子曰 吾十有五而志于學 三十而立 四十而不惑 五十而知天命 六十而耳順 七十而從心所欲 不踰矩",
+    "translation": "공자가 말했다. 나는 열다섯에 배움에 뜻을 두었고, 서른에 자립하였으며, 마흔에 미혹되지 않았고, 쉰에 천명을 알았으며, 예순에 남의 말을 순하게 들었고, 일흔에는 마음이 원하는 대로 해도 법도를 넘지 않았다.",
+    "themes": [
+      "배움",
+      "군자·수양",
+      "실천·행동"
+    ]
+  },
+  {
+    "id": 21,
+    "book": "爲政",
+    "bookIndex": 2,
+    "verseNumber": 5,
+    "title": "爲政 第二 5",
+    "original": "孟懿子問孝 子曰 無違",
+    "translation": "맹의자가 효를 묻자 공자가 말했다. 어김이 없어야 한다.",
+    "themes": [
+      "효·가족"
+    ]
+  }
+];
+
+const $ = (id) => document.getElementById(id);
+const KST_OFFSET = 9 * 60 * 60 * 1000;
+const STORAGE_KEY = "analects_bookmarks_v2";
+let selectedVerse = null;
+let bookmarkedOnly = false;
+
+
+function toast(message) {
+  const el = $("toast");
+  if (!el) return;
+  el.textContent = message;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 1500);
+}
+
+function getStudyDays() {
+  try { return new Set(JSON.parse(localStorage.getItem(STUDY_KEY) || "[]")); }
+  catch { return new Set(); }
+}
+
+function saveStudyDays(set) {
+  localStorage.setItem(STUDY_KEY, JSON.stringify([...set].sort()));
+}
+
+function getQuizScore() {
+  try { return JSON.parse(localStorage.getItem(QUIZ_KEY) || '{"total":0,"correct":0}'); }
+  catch { return { total: 0, correct: 0 }; }
+}
+
+function saveQuizScore(score) {
+  localStorage.setItem(QUIZ_KEY, JSON.stringify(score));
+}
+
+function daysAgoKey(offset) {
+  const d = new Date(Date.now() - offset * 86400000);
+  return dateKey(d);
+}
+
+function calculateStreak(days) {
+  let streak = 0;
+  for (let i = 0; i < 365; i++) {
+    if (days.has(daysAgoKey(i))) streak += 1;
+    else break;
+  }
+  return streak;
+}
+
+function calculateBestStreak(days) {
+  const sorted = [...days].sort();
+  let best = 0, current = 0, prev = null;
+  sorted.forEach(key => {
+    const time = new Date(key + "T00:00:00Z").getTime();
+    if (prev === null || time - prev === 86400000) current += 1;
+    else current = 1;
+    best = Math.max(best, current);
+    prev = time;
+  });
+  return best;
+}
+
+function completeToday() {
+  const days = getStudyDays();
+  const today = dateKey();
+  const already = days.has(today);
+  days.add(today);
+  saveStudyDays(days);
+  renderLearning();
+  updateStats();
+  toast(already ? "오늘 학습은 이미 기록되어 있습니다." : "오늘 학습 완료! 기록에 저장했습니다.");
+}
+
+function renderLearning() {
+  const days = getStudyDays();
+  const streak = calculateStreak(days);
+  $("recordStreak").textContent = `${streak}일`;
+  $("recordTotal").textContent = `${days.size}일`;
+  $("recordBest").textContent = `${calculateBestStreak(days)}일`;
+  if ($("statStreak")) $("statStreak").textContent = streak;
+
+  const labels = [];
+  for (let i = 13; i >= 0; i--) {
+    const key = daysAgoKey(i);
+    const [y, m, d] = key.split("-");
+    labels.push(`<div class="day-dot ${days.has(key) ? "done" : ""}" title="${key}">
+      ${Number(m)}/${Number(d)}<br>${days.has(key) ? "완료" : "—"}
+    </div>`);
+  }
+  $("studyCalendar").innerHTML = labels.join("");
+  $("studyMemo").value = localStorage.getItem(MEMO_KEY) || "";
+}
+
+function saveMemo() {
+  localStorage.setItem(MEMO_KEY, $("studyMemo").value);
+  toast("메모를 저장했습니다.");
+}
+
+function getBookmarks() {
+  try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")); }
+  catch { return new Set(); }
+}
+
+function saveBookmarks(set) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+}
+
+function kstDate(date = new Date()) {
+  return new Date(date.getTime() + KST_OFFSET);
+}
+
+function dateKey(date = new Date()) {
+  const d = kstDate(date);
+  return d.toISOString().slice(0,10);
+}
+
+function formatKoreanDate(key) {
+  const [y,m,d] = key.split("-");
+  return `${Number(m)}월 ${Number(d)}일`;
+}
+
+function indexForDate(key) {
+  const days = Math.floor(new Date(key + "T00:00:00Z").getTime() / 86400000);
+  return ((days % analectsData.length) + analectsData.length) % analectsData.length;
+}
+
+function verseForDate(key) {
+  return analectsData[indexForDate(key)];
+}
+
+function tagHTML(verse) {
+  return [`<span class="tag book">${verse.book} ${verse.verseNumber}</span>`, ...verse.themes.map(t => `<span class="tag">${t}</span>`)].join("");
+}
+
+function verseHTML(verse, compact=false) {
+  const bookmarks = getBookmarks();
+  const saved = bookmarks.has(String(verse.id));
+  return `
+    <div class="verse-card">
+      <div class="verse-head">
+        <div>
+          <div class="verse-title">${verse.title}</div>
+          <div class="mini">${verse.book} · ${verse.themes.join(" · ")}</div>
+        </div>
+        <div class="verse-actions">
+          <button class="tiny-btn ${saved ? "active" : ""}" onclick="toggleBookmark(${verse.id})">${saved ? "★ 저장됨" : "☆ 저장"}</button>
+          <button class="tiny-btn" onclick="copyVerse(${verse.id})">복사</button>
+        </div>
+      </div>
+      <div class="original">${verse.original}</div>
+      <p class="translation">${verse.translation}</p>
+      <div class="meta-row">${tagHTML(verse)}</div>
+    </div>
+  `;
+}
+
+function renderToday() {
+  const key = dateKey();
+  const verse = verseForDate(key);
+  selectedVerse = verse;
+  $("todayDate").textContent = formatKoreanDate(key);
+  $("todayContent").innerHTML = verseHTML(verse, true);
+  renderSelected(verse, `오늘의 논어 · ${formatKoreanDate(key)}`);
+}
+
+function renderSelected(verse, hint = "선택한 구절") {
+  selectedVerse = verse;
+  $("selectedHint").textContent = hint;
+  $("selectedVerse").innerHTML = verseHTML(verse);
+}
+
+function renderHistory() {
+  const list = [];
+  const today = new Date();
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(today.getTime() - i * 86400000);
+    const key = dateKey(d);
+    const verse = verseForDate(key);
+    list.push(`<button onclick="selectHistory('${key}')" title="${verse.title}">
+      <strong>${formatKoreanDate(key)}</strong>
+      <small>${verse.book} ${verse.verseNumber} · ${verse.themes[0] || ""}</small>
+    </button>`);
+  }
+  $("historyList").innerHTML = list.join("");
+}
+
+function selectHistory(key) {
+  renderSelected(verseForDate(key), `최근 30일 기록 · ${formatKoreanDate(key)}`);
+  $("selectedVerse").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function allThemes() {
+  return [...new Set(analectsData.flatMap(v => v.themes || []))].sort((a,b)=>a.localeCompare(b, "ko"));
+}
+
+function allBooks() {
+  const map = new Map();
+  analectsData.forEach(v => {
+    if (!map.has(v.book)) map.set(v.book, { book: v.book, bookIndex: v.bookIndex, count: 0 });
+    map.get(v.book).count += 1;
+  });
+  return [...map.values()].sort((a,b) => a.bookIndex - b.bookIndex);
+}
+
+function populateFilters() {
+  $("themeFilter").innerHTML = `<option value="">모든 주제</option>` + allThemes().map(t => `<option value="${t}">${t}</option>`).join("");
+  $("bookFilter").innerHTML = `<option value="">모든 편</option>` + allBooks().map(b => `<option value="${b.book}">${b.book} (${b.count})</option>`).join("");
+}
+
+function renderThemeCards() {
+  $("themeCards").innerHTML = allThemes().map(theme => {
+    const verses = analectsData.filter(v => v.themes.includes(theme));
+    const sample = verses[0];
+    return `<button class="theme-card" onclick="applyTheme('${theme}')">
+      <h3>${theme}</h3>
+      <div class="count">${verses.length}개 구절</div>
+      <div class="mini">${sample ? sample.translation.slice(0, 48) + "…" : ""}</div>
+    </button>`;
+  }).join("");
+}
+
+function renderBookCards() {
+  $("bookCards").innerHTML = allBooks().map(book => {
+    const verses = analectsData.filter(v => v.book === book.book);
+    return `<button class="book-card" onclick="applyBook('${book.book}')">
+      <h3>${book.book}</h3>
+      <div class="count">${book.count}개 구절</div>
+      <div class="mini">${verses.map(v => v.verseNumber).slice(0,5).join(", ")}${verses.length > 5 ? "…" : ""}</div>
+    </button>`;
+  }).join("");
+}
+
+function filteredVerses() {
+  const q = $("searchInput").value.trim().toLowerCase();
+  const theme = $("themeFilter").value;
+  const book = $("bookFilter").value;
+  const bookmarks = getBookmarks();
+
+  return analectsData.filter(v => {
+    const haystack = `${v.original} ${v.translation} ${v.title} ${v.book} ${v.themes.join(" ")}`.toLowerCase();
+    return (!q || haystack.includes(q))
+      && (!theme || v.themes.includes(theme))
+      && (!book || v.book === book)
+      && (!bookmarkedOnly || bookmarks.has(String(v.id)));
+  });
+}
+
+function renderVerseList() {
+  const verses = filteredVerses();
+  $("resultSummary").textContent = `${verses.length}개 구절이 표시됩니다.`;
+  $("verseList").innerHTML = verses.length
+    ? verses.map(v => verseHTML(v)).join("")
+    : `<div class="empty">조건에 맞는 구절이 없습니다. 검색어나 필터를 조정해 보세요.</div>`;
+  updateStats();
+}
+
+function applyTheme(theme) {
+  $("themeFilter").value = theme;
+  renderVerseList();
+  $("all-verses").scrollIntoView({behavior:"smooth"});
+}
+
+function applyBook(book) {
+  $("bookFilter").value = book;
+  renderVerseList();
+  $("all-verses").scrollIntoView({behavior:"smooth"});
+}
+
+function toggleBookmark(id) {
+  const bookmarks = getBookmarks();
+  const key = String(id);
+  const saved = bookmarks.has(key);
+  saved ? bookmarks.delete(key) : bookmarks.add(key);
+  saveBookmarks(bookmarks);
+  toast(saved ? "저장을 해제했습니다." : "구절을 저장했습니다.");
+  renderVerseList();
+  renderToday();
+  if (selectedVerse) renderSelected(selectedVerse, $("selectedHint").textContent);
+}
+
+function copyVerse(id) {
+  const v = analectsData.find(item => item.id === id);
+  const text = `${v.title}\n${v.original}\n${v.translation}`;
+  navigator.clipboard?.writeText(text).then(() => toast("구절을 복사했습니다."));
+}
+
+
+let currentQuiz = null;
+let quizLocked = false;
+
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
+function pickRandom(exceptId = null) {
+  const pool = analectsData.filter(v => v.id !== exceptId);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function makeQuiz() {
+  const verse = pickRandom();
+  const type = Math.floor(Math.random() * 3);
+  let prompt, source, answer, options, label;
+
+  if (type === 0) {
+    label = "뜻 맞히기";
+    prompt = "다음 원문의 알맞은 해석은?";
+    source = verse.original;
+    answer = verse.translation;
+    options = shuffle([answer, pickRandom(verse.id).translation, pickRandom(verse.id).translation, pickRandom(verse.id).translation]);
+  } else if (type === 1) {
+    label = "주제 맞히기";
+    prompt = "다음 구절과 가장 가까운 주제는?";
+    source = verse.translation;
+    answer = verse.themes[0];
+    options = shuffle([answer, ...shuffle(allThemes().filter(t => t !== answer)).slice(0, 3)]);
+  } else {
+    label = "원문 찾기";
+    prompt = "다음 해석에 맞는 원문은?";
+    source = verse.translation;
+    answer = verse.original;
+    options = shuffle([answer, pickRandom(verse.id).original, pickRandom(verse.id).original, pickRandom(verse.id).original]);
+  }
+
+  currentQuiz = { verse, answer };
+  quizLocked = false;
+  $("quizCard").innerHTML = `
+    <div class="quiz-question">
+      <div class="quiz-type">${label}</div>
+      <div class="quiz-prompt">${prompt}</div>
+      <div class="quiz-source">${source}</div>
+    </div>
+    <div class="quiz-options">
+      ${options.map((option, index) => `<button class="quiz-option" data-answer="${encodeURIComponent(option)}">${index + 1}. ${option}</button>`).join("")}
+    </div>
+    <div class="quiz-result" id="quizResult">정답을 골라보세요.</div>
+    <div class="quiz-actions">
+      <button class="btn primary" id="nextQuiz">다음 문제</button>
+      <button class="btn" id="resetQuizScore">점수 초기화</button>
+    </div>
+  `;
+  $("quizCard").querySelectorAll(".quiz-option").forEach(btn => btn.addEventListener("click", checkQuiz));
+  $("nextQuiz").addEventListener("click", makeQuiz);
+  $("resetQuizScore").addEventListener("click", () => {
+    saveQuizScore({ total: 0, correct: 0 });
+    renderQuizScore();
+    toast("퀴즈 점수를 초기화했습니다.");
+  });
+  renderQuizScore();
+}
+
+function checkQuiz(event) {
+  if (quizLocked) return;
+  quizLocked = true;
+  const picked = decodeURIComponent(event.currentTarget.dataset.answer);
+  const correct = picked === currentQuiz.answer;
+  const score = getQuizScore();
+  score.total += 1;
+  if (correct) score.correct += 1;
+  saveQuizScore(score);
+
+  $("quizCard").querySelectorAll(".quiz-option").forEach(btn => {
+    const value = decodeURIComponent(btn.dataset.answer);
+    if (value === currentQuiz.answer) btn.classList.add("correct");
+    else if (btn === event.currentTarget) btn.classList.add("wrong");
+  });
+
+  $("quizResult").textContent = correct
+    ? `정답입니다! ${currentQuiz.verse.title} 구절입니다.`
+    : `아쉬워요. 정답은 ${currentQuiz.verse.title}입니다.`;
+  renderQuizScore();
+}
+
+function renderQuizScore() {
+  const score = getQuizScore();
+  const rate = score.total ? Math.round(score.correct / score.total * 100) : 0;
+  $("quizScore").textContent = `${score.total}문제 풀이 · 정답 ${score.correct}개 · 정답률 ${rate}%`;
+}
+
+function updateStats() {
+  const bookmarks = getBookmarks();
+  $("statVerses").textContent = analectsData.length;
+  $("statBooks").textContent = allBooks().length;
+  $("statThemes").textContent = allThemes().length;
+  $("statBookmarks").textContent = bookmarks.size;
+  if ($("statStreak")) $("statStreak").textContent = calculateStreak(getStudyDays());
+  const pct = analectsData.length ? Math.round((bookmarks.size / analectsData.length) * 100) : 0;
+  $("progressText").textContent = `저장한 구절 ${bookmarks.size}개 · 전체의 ${pct}%`;
+  $("progressBar").style.width = `${pct}%`;
+}
+
+function resetFilters() {
+  $("searchInput").value = "";
+  $("themeFilter").value = "";
+  $("bookFilter").value = "";
+  bookmarkedOnly = false;
+  $("bookmarkedOnly").classList.remove("active");
+  renderVerseList();
+}
+
+function initPreferences() {
+  const savedTheme = localStorage.getItem("analects_theme") || "light";
+  document.documentElement.dataset.theme = savedTheme;
+  $("themeToggle").textContent = savedTheme === "dark" ? "☀️" : "🌙";
+
+  const scale = localStorage.getItem("analects_font_scale") || "1";
+  document.documentElement.style.setProperty("--font-scale", scale);
+}
+
+function changeFont(delta) {
+  const current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--font-scale")) || 1;
+  const next = Math.min(1.18, Math.max(.92, +(current + delta).toFixed(2)));
+  document.documentElement.style.setProperty("--font-scale", next);
+  localStorage.setItem("analects_font_scale", next);
+}
+
+function init() {
+  initPreferences();
+  populateFilters();
+  renderToday();
+  renderHistory();
+  renderThemeCards();
+  renderBookCards();
+  renderVerseList();
+  updateStats();
+  renderLearning();
+  makeQuiz();
+
+  $("searchInput").addEventListener("input", renderVerseList);
+  $("themeFilter").addEventListener("change", renderVerseList);
+  $("bookFilter").addEventListener("change", renderVerseList);
+  $("resetBtn").addEventListener("click", resetFilters);
+  $("completeToday").addEventListener("click", completeToday);
+  $("saveMemo").addEventListener("click", saveMemo);
+  $("randomBtn").addEventListener("click", () => {
+    const verse = analectsData[Math.floor(Math.random() * analectsData.length)];
+    renderSelected(verse, "무작위 구절");
+    $("selectedVerse").scrollIntoView({behavior:"smooth", block:"center"});
+  });
+  $("todayCopy").addEventListener("click", () => selectedVerse && copyVerse(selectedVerse.id));
+  $("bookmarkedOnly").addEventListener("click", () => {
+    bookmarkedOnly = !bookmarkedOnly;
+    $("bookmarkedOnly").classList.toggle("active", bookmarkedOnly);
+    renderVerseList();
+  });
+  $("themeToggle").addEventListener("click", () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem("analects_theme", next);
+    $("themeToggle").textContent = next === "dark" ? "☀️" : "🌙";
+  });
+  $("fontUp").addEventListener("click", () => changeFont(.04));
+  $("fontDown").addEventListener("click", () => changeFont(-.04));
+}
+
+init();
+  </script>
+</body>
+</html>
